@@ -11,7 +11,13 @@ class Translator:
         )
 
     def english_to_spanish(self, text):
-        return self.model_en_to_es(text)[0]["translation_text"]
+        t = self.model_en_to_es(text)
+        if len(t) > 0:
+            return t[0]["translation_text"]
+        return text
 
     def spanish_to_english(self, text):
-        return self.model_es_to_en(text)[0]["translation_text"]
+        t = self.model_es_to_en(text)
+        if len(t) > 0:
+            return t[0]["translation_text"]
+        return text

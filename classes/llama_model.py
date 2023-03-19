@@ -14,9 +14,15 @@ class LlamaModel:
         num_beams=4,
         max_new_tokens=255,
         translate=True,
+        memory_size=5,
     ):
         llama_7b_hf = "decapoda-research/llama-7b-hf"
         alpaca_lora_7b = "tloen/alpaca-lora-7b"
+
+        self.memory_size = memory_size
+        self.conversation = []
+        self.last_response = ""
+
         self.tokenizer = LlamaTokenizer.from_pretrained(llama_7b_hf)
 
         if torch.cuda.is_available():
@@ -70,20 +76,36 @@ class LlamaModel:
         if self.translate:
             self.translator = Translator()
 
-    def generate_prompt(self, instruction, input):
         with open("prompt_base.txt", "r") as f:
-            prompt = f.read()
+            self.prompt = f.read()
+
+    def generate_prompt(self, instruction):
+        prompt = self.prompt
+
+        conversarion_min = []
+        if len(self.conversation) < self.memory_size:
+            conversarion_min = self.conversation
+        else:
+            conversarion_min = self.conversation[-self.memory_size :]
+
+        input_text = ""
+        for i in conversarion_min:
+            input_text += f"### {i}\n\n"
+
         prompt = prompt.replace("{instruction}", instruction)
-        prompt = prompt.replace("{input}", input)
+        prompt = prompt.replace("{input}", input_text)
+
         return prompt
 
     @to_thread
-    def evaluate(self, instruction, input_text):
+    def evaluate(self, instruction, initial_input_text):
         if self.translate:
             instruction = self.translator.spanish_to_english(instruction)
-            input_text = self.translator.spanish_to_english(input_text)
+            input_text = self.translator.spanish_to_english(initial_input_text)
 
-        prompt = self.generate_prompt(instruction, input_text)
+        self.conversation.append(initial_input_text)
+
+        prompt = self.generate_prompt(instruction)
         inputs = self.tokenizer(prompt, return_tensors="pt")
         input_ids = inputs["input_ids"].to(self.device)
 
@@ -98,6 +120,12 @@ class LlamaModel:
         s = generation_output.sequences[0]
         output = self.tokenizer.decode(s)
         output = output.split("### Response:")[1].strip()
+
+        self.conversation.append(f"Me: {output}")
+
+        if self.last_response == output or initial_input_text == output:
+            self.conversation.clear()
+        self.last_response = output
 
         if self.translate:
             output = self.translator.english_to_spanish(output)
