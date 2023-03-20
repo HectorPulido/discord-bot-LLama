@@ -76,7 +76,7 @@ class LlamaModel:
         if self.translate:
             self.translator = Translator()
 
-        with open("prompt_base.txt", "r") as f:
+        with open("prompt_base.txt", "r", encoding="utf-8") as f:
             self.prompt = f.read()
 
     def generate_prompt(self, instruction):
@@ -102,8 +102,10 @@ class LlamaModel:
         if self.translate:
             instruction = self.translator.spanish_to_english(instruction)
             input_text = self.translator.spanish_to_english(initial_input_text)
+        else:
+            input_text = initial_input_text
 
-        self.conversation.append(initial_input_text)
+        self.conversation.append(input_text)
 
         prompt = self.generate_prompt(instruction)
         inputs = self.tokenizer(prompt, return_tensors="pt")
@@ -117,13 +119,13 @@ class LlamaModel:
                 output_scores=True,
                 max_new_tokens=self.max_new_tokens,
             )
-        s = generation_output.sequences[0]
-        output = self.tokenizer.decode(s)
+        sequence = generation_output.sequences[0]
+        output = self.tokenizer.decode(sequence)
         output = output.split("### Response:")[1].strip()
 
         self.conversation.append(f"Me: {output}")
 
-        if self.last_response == output or initial_input_text == output:
+        if output in [self.last_response, initial_input_text]:
             self.conversation.clear()
         self.last_response = output
 

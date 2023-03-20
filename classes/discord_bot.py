@@ -6,7 +6,7 @@ from classes.llama_model import LlamaModel
 
 class LLamaBot(commands.Bot):
     def __init__(self):
-        with open("instructions.txt", "r") as f:
+        with open("instructions.txt", "r", encoding="utf-8") as f:
             instruction = f.read()
         self.instruction = instruction
         self.llama_model = LlamaModel()
