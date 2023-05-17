@@ -11,13 +11,16 @@ class Translator:
         )
 
     def english_to_spanish(self, text):
-        t = self.model_en_to_es(text)
-        if len(t) > 0:
-            return t[0]["translation_text"]
-        return text
+        text = text.replace("?", "<qm>")
+
+        translation = self.model_en_to_es(text)
+        if len(translation) > 0:
+            return translation[0]["translation_text"].replace("<qm>", "?")
+        return text.replace("<qm>", "?")
 
     def spanish_to_english(self, text):
-        t = self.model_es_to_en(text)
-        if len(t) > 0:
-            return t[0]["translation_text"]
-        return text
+        text = text.replace("?", "<qm>")
+        translation = self.model_es_to_en(text)
+        if len(translation) > 0:
+            return translation[0]["translation_text"].replace("<qm>", "?")
+        return text.replace("<qm>", "?")
