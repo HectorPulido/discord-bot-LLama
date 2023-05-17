@@ -1,6 +1,8 @@
 import re
 import os
+import random
 import discord
+from discord.ext import tasks
 from discord.ext.commands import Bot
 from classes.llama_model import LlamaModel
 
@@ -20,6 +22,10 @@ class LLamaBot(Bot):
     async def on_message(self, message):
         if message.author == self.user:
             return
+
+        if "!change_status" in message.content:
+            new_status = message.content.split("!change_status")[1]
+            await self.change_presence(activity=discord.Game(name=new_status))
 
         if not self.user.mentioned_in(message):
             return

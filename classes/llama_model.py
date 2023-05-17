@@ -34,7 +34,7 @@ class LlamaModel:
         else:
             conversarion_min = self.conversation[-self.memory_size :]
 
-        input_text = "\n\n".join([f"> {i}" for i in conversarion_min])
+        input_text = "\n".join([f"> {i}" for i in conversarion_min])
 
         prompt = prompt.replace("{input}", input_text)
 
@@ -53,6 +53,7 @@ class LlamaModel:
         self.conversation.append(input_text)
 
         prompt = self.generate_prompt()
+        print(prompt)
         output = self.gptj.generate(prompt, **self.kwargs)
 
         self.conversation.append(f"Me: {output}")
@@ -63,4 +64,4 @@ class LlamaModel:
 
         if self.translate:
             output = self.translator.english_to_spanish(output)
-        return output
+        return output.strip().split("\n")[0]
