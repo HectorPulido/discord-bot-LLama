@@ -1,3 +1,4 @@
+import re
 import gpt4all
 from classes.translation import Translator
 from classes.util import to_thread
@@ -60,8 +61,13 @@ class LlamaModel:
 
         if output in [self.last_response, initial_input_text]:
             self.conversation.clear()
+
+        output = output.strip()
+        output = re.split(r"[\n\#\>]", output)[0].strip()
+
         self.last_response = output
 
         if self.translate:
             output = self.translator.english_to_spanish(output)
-        return output.strip().split("\n")[0]
+
+        return output
