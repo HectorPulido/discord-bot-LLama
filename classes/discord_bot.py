@@ -1,15 +1,14 @@
 import re
+import os
 import discord
-from discord.ext import commands
+from discord.ext.commands import Bot
 from classes.llama_model import LlamaModel
 
 
-class LLamaBot(commands.Bot):
+class LLamaBot(Bot):
     def __init__(self):
-        with open("instructions.txt", "r", encoding="utf-8") as f:
-            instruction = f.read()
-        self.instruction = instruction
-        self.llama_model = LlamaModel()
+        model_name = os.getenv("MODEL_NAME")
+        self.llama_model = LlamaModel(model_name=model_name, temp=0.9)
 
         intents = discord.Intents.default()
         intents.message_content = True
@@ -32,6 +31,6 @@ class LLamaBot(commands.Bot):
         print(f"Message received: {message_text}")
 
         async with message.channel.typing():
-            response = await self.llama_model.evaluate(self.instruction, message_text)
+            response = await self.llama_model.evaluate(message_text)
             await message.reply(response, mention_author=True)
             print(f"Response sent: {response}.")

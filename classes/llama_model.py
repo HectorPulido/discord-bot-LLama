@@ -1,7 +1,4 @@
-import torch
-from peft import PeftModel
-from transformers import LlamaTokenizer, LlamaForCausalLM, GenerationConfig
-
+import gpt4all
 from classes.translation import Translator
 from classes.util import to_thread
 
@@ -9,77 +6,26 @@ from classes.util import to_thread
 class LlamaModel:
     def __init__(
         self,
-        temperature=0.1,
-        top_p=0.75,
-        num_beams=4,
-        max_new_tokens=255,
+        model_name="ggml-gpt4all-l13b-snoozy.bin",
         translate=True,
-        memory_size=5,
+        memory_size=3,
+        **kwargs,
     ):
-        llama_7b_hf = "decapoda-research/llama-7b-hf"
-        alpaca_lora_7b = "tloen/alpaca-lora-7b"
-
+        self.kwargs = kwargs
         self.memory_size = memory_size
         self.conversation = []
         self.last_response = ""
 
-        self.tokenizer = LlamaTokenizer.from_pretrained(llama_7b_hf)
-
-        if torch.cuda.is_available():
-            self.device = "cuda"
-        else:
-            self.device = "cpu"
-            if torch.backends.mps.is_available():
-                self.device = "mps"
-
-        if self.device == "cuda":
-            model = LlamaForCausalLM.from_pretrained(
-                llama_7b_hf,
-                load_in_8bit=True,
-                torch_dtype=torch.float16,
-                device_map="auto",
-            )
-            self.model = PeftModel.from_pretrained(
-                model, alpaca_lora_7b, torch_dtype=torch.float16
-            )
-        elif self.device == "mps":
-            model = LlamaForCausalLM.from_pretrained(
-                llama_7b_hf,
-                device_map={"": self.device},
-                torch_dtype=torch.float16,
-            )
-            self.model = PeftModel.from_pretrained(
-                model,
-                alpaca_lora_7b,
-                device_map={"": self.device},
-                torch_dtype=torch.float16,
-            )
-        else:
-            model = LlamaForCausalLM.from_pretrained(
-                llama_7b_hf, device_map={"": self.device}, low_cpu_mem_usage=True
-            )
-            self.model = PeftModel.from_pretrained(
-                model,
-                alpaca_lora_7b,
-                device_map={"": self.device},
-            )
-
-        self.generation_config = GenerationConfig(
-            temperature=temperature,
-            top_p=top_p,
-            num_beams=num_beams,
-        )
-
-        self.max_new_tokens = max_new_tokens
+        self.gptj = gpt4all.GPT4All(model_name)
 
         self.translate = translate
         if self.translate:
             self.translator = Translator()
 
-        with open("prompt_base.txt", "r", encoding="utf-8") as f:
-            self.prompt = f.read()
+        with open("prompt_base.txt", "r", encoding="utf-8") as file:
+            self.prompt = file.read()
 
-    def generate_prompt(self, instruction):
+    def generate_prompt(self):
         prompt = self.prompt
 
         conversarion_min = []
@@ -88,40 +34,26 @@ class LlamaModel:
         else:
             conversarion_min = self.conversation[-self.memory_size :]
 
-        input_text = ""
-        for i in conversarion_min:
-            input_text += f"### {i}\n\n"
+        input_text = "\n\n".join([f"> {i}" for i in conversarion_min])
 
-        prompt = prompt.replace("{instruction}", instruction)
         prompt = prompt.replace("{input}", input_text)
 
         return prompt
 
     @to_thread
-    def evaluate(self, instruction, initial_input_text):
+    def evaluate(self, initial_input_text):
+        return self.evaluate_sync(initial_input_text)
+
+    def evaluate_sync(self, initial_input_text):
         if self.translate:
-            instruction = self.translator.spanish_to_english(instruction)
             input_text = self.translator.spanish_to_english(initial_input_text)
         else:
             input_text = initial_input_text
 
         self.conversation.append(input_text)
 
-        prompt = self.generate_prompt(instruction)
-        inputs = self.tokenizer(prompt, return_tensors="pt")
-        input_ids = inputs["input_ids"].to(self.device)
-
-        with torch.no_grad():
-            generation_output = self.model.generate(
-                input_ids=input_ids,
-                generation_config=self.generation_config,
-                return_dict_in_generate=True,
-                output_scores=True,
-                max_new_tokens=self.max_new_tokens,
-            )
-        sequence = generation_output.sequences[0]
-        output = self.tokenizer.decode(sequence)
-        output = output.split("### Response:")[1].strip()
+        prompt = self.generate_prompt()
+        output = self.gptj.generate(prompt, **self.kwargs)
 
         self.conversation.append(f"Me: {output}")
 

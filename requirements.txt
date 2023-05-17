@@ -1,9 +1,4 @@
-bitsandbytes
-datasets
-loralib
-sentencepiece
 git+https://github.com/huggingface/transformers.git
-git+https://github.com/huggingface/peft.git
 discord.py
 python-dotenv
-sacremoses
+gpt4all
