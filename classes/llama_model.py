@@ -35,7 +35,7 @@ class LlamaModel:
         else:
             conversarion_min = self.conversation[-self.memory_size :]
 
-        input_text = "\n".join([f"> {i}" for i in conversarion_min])
+        input_text = "\n".join([f"### {i}" for i in conversarion_min])
 
         prompt = prompt.replace("{input}", input_text)
 
@@ -54,16 +54,14 @@ class LlamaModel:
         self.conversation.append(input_text)
 
         prompt = self.generate_prompt()
-        print(prompt)
         output = self.gptj.generate(prompt, **self.kwargs)
 
-        self.conversation.append(f"Me: {output}")
+        self.conversation.append(f"Response: {output}")
 
         if output in [self.last_response, initial_input_text]:
             self.conversation.clear()
 
         output = output.strip()
-        output = re.split(r"[\n\#\>]", output)[0].strip()
 
         self.last_response = output
 

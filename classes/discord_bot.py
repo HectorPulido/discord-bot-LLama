@@ -1,8 +1,7 @@
 import re
 import os
-import random
+import asyncio
 import discord
-from discord.ext import tasks
 from discord.ext.commands import Bot
 from classes.llama_model import LlamaModel
 
@@ -10,7 +9,9 @@ from classes.llama_model import LlamaModel
 class LLamaBot(Bot):
     def __init__(self):
         model_name = os.getenv("MODEL_NAME")
-        self.llama_model = LlamaModel(model_name=model_name, temp=0.9)
+        self.model = LlamaModel(model_name=model_name, memory_size=1, temp=0.9)
+
+        self.model_lock = False
 
         intents = discord.Intents.default()
         intents.message_content = True
@@ -30,13 +31,17 @@ class LLamaBot(Bot):
         if not self.user.mentioned_in(message):
             return
 
+        while self.model_lock:
+            await asyncio.sleep(1)
+
         message_text = str(message.content)
         message_text = re.sub(r"<@\d+>", "", message_text).strip()
         message_text = f"{message.author.display_name}: {message_text}"
 
-        print(f"Message received: {message_text}")
-
         async with message.channel.typing():
-            response = await self.llama_model.evaluate(message_text)
+            self.model_lock = True
+            response = await self.model.evaluate(message_text)
             await message.reply(response, mention_author=True)
-            print(f"Response sent: {response}.")
+
+        await asyncio.sleep(1)
+        self.model_lock = False
