@@ -35,18 +35,18 @@ class LLamaBot(Bot):
 
         while self.model_lock:
             logging.info("Waiting for model to unlock...")
-            await asyncio.sleep(1)
+            await asyncio.sleep(10)
 
         message_text = str(message.content)
         message_text = re.sub(r"<@\d+>", "", message_text).strip()
         message_text = f"{message.author.display_name}: {message_text}"
 
-        logging.info(f"Message received: {message_text}")
+        logging.info("Message received: %s", message_text)
 
         async with message.channel.typing():
             self.model_lock = True
             response = await self.model.evaluate(message_text)
-            logging.info(f"Response: {response}")
+            logging.info("Response: %s", response)
             await message.reply(response, mention_author=True)
 
         await asyncio.sleep(1)
