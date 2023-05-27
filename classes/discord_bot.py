@@ -12,7 +12,7 @@ class LLamaBot(Bot):
         model_name = os.getenv("MODEL_NAME")
         self.model_lock = False
 
-        self.model = LlamaModel(model_name=model_name, memory_size=1, temp=0.9)
+        self.model = LlamaModel(model_name=model_name, memory_size=5, temp=0.9)
 
         intents = discord.Intents.default()
         intents.message_content = True

@@ -1,6 +1,6 @@
 import os
-from classes.llama_model import LlamaModel
 from dotenv import load_dotenv
+from classes.llama_model import LlamaModel
 
 load_dotenv()
 

@@ -7,7 +7,7 @@ load_dotenv()
 TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     filename="app.log",
     filemode="w",
     format="%(asctime)s -%(name)s - %(levelname)s - %(message)s",

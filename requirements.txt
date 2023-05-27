@@ -2,3 +2,4 @@ transformers
 discord.py
 python-dotenv
 gpt4all
+transformers[sentencepiece]

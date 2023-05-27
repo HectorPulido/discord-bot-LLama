@@ -3,6 +3,24 @@ from transformers import pipeline
 
 class Translator:
     def __init__(self):
+        self.special_tokens_dict = {
+            ")": "<cp>",
+            "(": "<op>",
+            "?": "<qm>",
+            "=": "<equal>",
+            "#": "<hash>",
+            "@": "<at>",
+            "&": "<ampersand>",
+            "%": "<percent>",
+            "$": "<dollar>",
+            "£": "<pound>",
+            "€": "<euro>",
+            "¥": "<yen>",
+        }
+        self.reverse_special_tokens_dict = {
+            v: k for k, v in self.special_tokens_dict.items()
+        }
+
         self.model_en_to_es = pipeline(
             "translation", model="Helsinki-NLP/opus-mt-en-es"
         )
@@ -11,16 +29,30 @@ class Translator:
         )
 
     def english_to_spanish(self, text):
-        text = text.replace("?", "<qm>")
+        for key, value in self.special_tokens_dict.items():
+            text = text.replace(key, value)
 
         translation = self.model_en_to_es(text)
         if len(translation) > 0:
-            return translation[0]["translation_text"].replace("<qm>", "?")
-        return text.replace("<qm>", "?")
+            text = translation[0]["translation_text"]
+
+        for key, value in self.reverse_special_tokens_dict.items():
+            text = text.replace(key, value)
+
+        return text
 
     def spanish_to_english(self, text):
-        text = text.replace("?", "<qm>")
+        if "¿" not in text and "?" in text:
+            text = "¿" + text
+
+        for key, value in self.special_tokens_dict.items():
+            text = text.replace(key, value)
+
         translation = self.model_es_to_en(text)
         if len(translation) > 0:
-            return translation[0]["translation_text"].replace("<qm>", "?")
-        return text.replace("<qm>", "?")
+            text = translation[0]["translation_text"]
+
+        for key, value in self.reverse_special_tokens_dict.items():
+            text = text.replace(key, value)
+
+        return text
