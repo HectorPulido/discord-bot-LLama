@@ -4,6 +4,7 @@ import logging
 import asyncio
 import discord
 from discord.ext.commands import Bot
+from discord.channel import TextChannel
 from classes.llama_model import LlamaModel
 
 
@@ -23,6 +24,10 @@ class LLamaBot(Bot):
 
     async def on_message(self, message):
         if message.author == self.user:
+            return
+
+        if not isinstance(message.channel, TextChannel):
+            await message.reply("Sorry, I can't talk here.", mention_author=True)
             return
 
         if "!change_status" in message.content:
