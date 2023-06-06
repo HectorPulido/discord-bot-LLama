@@ -26,16 +26,16 @@ class LLamaBot(Bot):
         if message.author == self.user:
             return
 
-        if not isinstance(message.channel, TextChannel):
-            await message.reply("Sorry, I can't talk here.", mention_author=True)
-            return
-
         if "!change_status" in message.content:
             logging.info("Changing status...")
             new_status = message.content.split("!change_status")[1]
             await self.change_presence(activity=discord.Game(name=new_status))
 
         if not self.user.mentioned_in(message):
+            return
+        
+        if not isinstance(message.channel, TextChannel):
+            await message.reply("Sorry, I can't talk here.", mention_author=True)
             return
 
         while self.model_lock:
