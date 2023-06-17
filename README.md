@@ -17,6 +17,9 @@ After installing Python 3, you can follow the instructions:
 4. Create a file with the name ```.env``` and fill it with your token, use the ```.env.example``` file as a template.
 5. Run the main.py file in your terminal, using ```python main.py```.
 
+## For ARM
+[Follow this instructions](https://github.com/nomic-ai/gpt4all/issues/553#issuecomment-1584167667)
+
 ## In colab
 To use LLAMA in colab, 
 1. you need to have a google account. 
