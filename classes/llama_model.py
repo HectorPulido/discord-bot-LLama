@@ -48,7 +48,7 @@ class LlamaModel:
         else:
             conversarion_min = self.conversation[-self.memory_size :]
 
-        input_text = "\n".join([f"### {i}" for i in conversarion_min])
+        input_text = "\n".join([f"> {i}" for i in conversarion_min])
 
         prompt = prompt.replace("{input}", input_text)
 
@@ -114,6 +114,7 @@ class LlamaModel:
     def _process_output(self, output):
         output = output.strip()
         output = re.split(r"\n+|#", output)[0].strip()
+        output = output.replace(">", "")
 
         self.last_response = output
 

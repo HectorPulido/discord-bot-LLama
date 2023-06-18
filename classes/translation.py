@@ -4,21 +4,21 @@ from transformers import pipeline
 class Translator:
     def __init__(self):
         self.special_tokens_dict = {
-            ")": "<cp>",
-            "(": "<op>",
-            "?": "<qm>",
-            "=": "<equal>",
-            "#": "<hash>",
-            "@": "<at>",
-            "&": "<ampersand>",
-            "%": "<percent>",
-            "$": "<dollar>",
-            "£": "<pound>",
-            "€": "<euro>",
-            "¥": "<yen>",
+            ")": "<cp> ",
+            "(": "<op> ",
+            "?": "<qm> ",
+            "=": "<equal>" ,
+            "#": "<hash> ",
+            "@": "<at> ",
+            "&": "<ampersand> ",
+            "%": "<percent> ",
+            "$": "<dollar> ",
+            "£": "<pound> ",
+            "€": "<euro> ",
+            "¥": "<yen> ",
         }
         self.reverse_special_tokens_dict = {
-            v: k for k, v in self.special_tokens_dict.items()
+            v.strip(): k for k, v in self.special_tokens_dict.items()
         }
 
         self.model_en_to_es = pipeline(
