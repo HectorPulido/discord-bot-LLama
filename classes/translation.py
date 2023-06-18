@@ -7,7 +7,7 @@ class Translator:
             ")": "<cp> ",
             "(": "<op> ",
             "?": "<qm> ",
-            "=": "<equal>" ,
+            "=": "<equal>",
             "#": "<hash> ",
             "@": "<at> ",
             "&": "<ampersand> ",

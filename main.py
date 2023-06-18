@@ -1,6 +1,6 @@
 import os
 import logging
-from classes.discord_bot import LLamaBot
+from classes import DiscordLLMBot
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,5 +15,5 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    bot = LLamaBot()
+    bot = DiscordLLMBot()
     bot.run(TOKEN_DISCORD)
