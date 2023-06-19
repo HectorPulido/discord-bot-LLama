@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")
 MODEL_NAME = os.getenv("MODEL_NAME")
+MEMORY_SIZE = int(os.getenv("MEMORY_SIZE"))
 
 logging.basicConfig(
     level=logging.DEBUG,

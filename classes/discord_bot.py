@@ -11,7 +11,7 @@ from classes import GeneralLLMModel, MemoryModel, Translator
 
 
 class DiscordLLMBot(Bot):
-    def __init__(self, model_name):
+    def __init__(self, model_name, memory_size=5):
         llm_model = gpt4all.GPT4All(model_name)
         translator = Translator()
 
@@ -25,13 +25,15 @@ class DiscordLLMBot(Bot):
             "!clear": self._clear_memory,
         }
 
+        self.memory_size = memory_size
+
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(command_prefix="!", intents=intents)
 
     def _get_memory(self, channel_id):
         if channel_id not in self.memories:
-            self.memories[channel_id] = MemoryModel(memory_size=5)
+            self.memories[channel_id] = MemoryModel(memory_size=self.memory_size)
         return self.memories[channel_id]
 
     def _clear_memory(self, message):
