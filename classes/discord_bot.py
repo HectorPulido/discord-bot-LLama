@@ -11,8 +11,7 @@ from classes import GeneralLLMModel, MemoryModel, Translator
 
 
 class DiscordLLMBot(Bot):
-    def __init__(self):
-        model_name = os.getenv("MODEL_NAME")
+    def __init__(self, model_name):
         llm_model = gpt4all.GPT4All(model_name)
         translator = Translator()
 
@@ -21,7 +20,10 @@ class DiscordLLMBot(Bot):
         )
         self.memories = {}
         self.model_lock = False
-        self.discord_commands = {"!change_status": self._change_status}
+        self.discord_commands = {
+            "!change_status": self._change_status,
+            "!clear": self._clear_memory,
+        }
 
         intents = discord.Intents.default()
         intents.message_content = True
@@ -32,7 +34,18 @@ class DiscordLLMBot(Bot):
             self.memories[channel_id] = MemoryModel(memory_size=5)
         return self.memories[channel_id]
 
+    def _clear_memory(self, message):
+        if not message.author.server_permissions.administrator:
+            message.reply("You don't have permission to do that.", mention_author=True)
+            return
+        self.memories = {}
+        message.reply("Memory cleared.", mention_author=True)
+
     async def _change_status(self, message):
+        if not message.author.server_permissions.administrator:
+            message.reply("You don't have permission to do that.", mention_author=True)
+            return
+
         logging.info("Changing status...")
         new_status = message.content.split("!change_status")[1]
         await self.change_presence(activity=discord.Game(name=new_status))
@@ -54,7 +67,7 @@ class DiscordLLMBot(Bot):
             await asyncio.sleep(10)
 
         message_text = str(message.content)
-        message_text = re.sub(r"<@\d+>", "", message_text).strip()
+        message_text = re.sub(r"<@\d+>", "", message_text).strip()[:-100]
         message_text = f"{message.author.display_name}: {message_text}"
 
         logging.info("Message received in %s: %s", message.channel.id, message_text)

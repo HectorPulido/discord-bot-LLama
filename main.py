@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")
+MODEL_NAME = os.getenv("MODEL_NAME")
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -15,5 +16,5 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    bot = DiscordLLMBot()
+    bot = DiscordLLMBot(MODEL_NAME)
     bot.run(TOKEN_DISCORD)

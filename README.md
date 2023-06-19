@@ -12,10 +12,8 @@ To use LLAMA, you need to have Python 3 installed on your machine. You can downl
 After installing Python 3, you can follow the instructions:
 
 1. Clone the repository to your local machine.
-2. Install the required Python packages by running ```pip install -r requirements.txt``` in your terminal.
-3. Create a new Discord bot account and invite it to your server.
-4. Create a file with the name ```.env``` and fill it with your token, use the ```.env.example``` file as a template.
-5. Run the main.py file in your terminal, using ```python main.py```.
+2. Excecute ```pip install fabric``` if you don't have it already and only first time
+3. ```fab start-bot``` to start the discor bot
 
 ## For ARM
 [Follow this instructions](https://github.com/nomic-ai/gpt4all/issues/553#issuecomment-1584167667)
