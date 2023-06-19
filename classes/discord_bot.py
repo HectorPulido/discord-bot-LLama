@@ -67,7 +67,7 @@ class DiscordLLMBot(Bot):
             await asyncio.sleep(10)
 
         message_text = str(message.content)
-        message_text = re.sub(r"<@\d+>", "", message_text).strip()[:-100]
+        message_text = re.sub(r"<@\d+>", "", message_text).strip()[-100:]
         message_text = f"{message.author.display_name}: {message_text}"
 
         logging.info("Message received in %s: %s", message.channel.id, message_text)
