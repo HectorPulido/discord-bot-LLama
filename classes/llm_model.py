@@ -64,9 +64,12 @@ class LLMModel(ABC):
         return input_text
 
     def _generate_output(self, prompt):
-        output = self.llm_model.generate(prompt, **self.kwargs)
-        logging.debug("Generated output: %s", output)
-        return output
+        while True:
+            output = self.llm_model.generate(prompt, **self.kwargs)
+            if len(output.strip()) > 0:
+                logging.debug("Generated output: %s", output)
+                return output
+            logging.error("Generation failed, retrying...")
 
     def _translate_output(self, output):
         if self.translator is not None:
