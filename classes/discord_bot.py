@@ -3,18 +3,24 @@ import os
 import logging
 import asyncio
 import discord
+import gpt4all
 from discord.ext.commands import Bot
 from discord.channel import TextChannel
-from classes import LlamaModel, MemoryModel
+
+from classes import GeneralLLMModel, MemoryModel, Translator
 
 
 class DiscordLLMBot(Bot):
     def __init__(self):
         model_name = os.getenv("MODEL_NAME")
-        self.model_lock = False
-        self.model = LlamaModel(model_name=model_name, temp=0.9)
-        self.memories = {}
+        llm_model = gpt4all.GPT4All(model_name)
+        translator = Translator()
 
+        self.model = GeneralLLMModel(
+            llm_model, translator, prompt_path="prompts/base_prompt.txt", temp=0.9
+        )
+        self.memories = {}
+        self.model_lock = False
         self.discord_commands = {"!change_status": self._change_status}
 
         intents = discord.Intents.default()
@@ -64,7 +70,7 @@ class DiscordLLMBot(Bot):
         self.model_lock = False
 
     async def on_ready(self):
-        print(f"Bot {self.user.display_name} is connected to server.")
+        logging.info("Bot %s is connected to server.", self.user.display_name)
 
     async def on_message(self, message):
         if message.author == self.user:
