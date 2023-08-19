@@ -1,3 +1,6 @@
+import sys
+sys.path.append('path')
+
 from memory_model import MemoryModel
 
 
