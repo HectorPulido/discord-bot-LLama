@@ -1,7 +1,8 @@
 import os
 import logging
-from classes import DiscordLLMBot
 from dotenv import load_dotenv
+from discord_client import DiscordLLMBot
+
 
 load_dotenv()
 TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")

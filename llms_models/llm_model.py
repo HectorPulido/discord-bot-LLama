@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from classes.util import to_thread
+from utils import to_thread
 
 
 class LLMModel(ABC):

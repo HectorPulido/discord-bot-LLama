@@ -1,5 +1,4 @@
 import re
-import os
 import logging
 import asyncio
 import discord
@@ -7,7 +6,9 @@ import gpt4all
 from discord.ext.commands import Bot
 from discord.channel import TextChannel
 
-from classes import GeneralLLMModel, MemoryModel, Translator
+from memory import MultiChannelMemory
+from translator import Translator
+from llms_models import GeneralLLMModel
 
 
 class DiscordLLMBot(Bot):
@@ -22,7 +23,9 @@ class DiscordLLMBot(Bot):
         self.model = GeneralLLMModel(
             llm_model, translator, prompt_path="prompts/base_prompt.txt", temp=0.9
         )
-        self.memories = {}
+        self.memories = MultiChannelMemory(
+            memory_size=memory_size, load_path="memory.mem"
+        )
         self.model_lock = False
         self.discord_commands = {
             "!change_status": self._change_status,
@@ -35,18 +38,13 @@ class DiscordLLMBot(Bot):
         intents.message_content = True
         super().__init__(command_prefix="!", intents=intents)
 
-    def _get_memory(self, channel_id):
-        if channel_id not in self.memories:
-            self.memories[channel_id] = MemoryModel(memory_size=self.memory_size)
-        return self.memories[channel_id]
-
     async def _clear_memory(self, message):
         if not message.author.guild_permissions.manage_messages:
             await message.reply(
                 "You don't have permission to do that.", mention_author=True
             )
             return
-        self.memories = {}
+        self.memories.clear_all_memory()
         await message.reply("Memory cleared.", mention_author=True)
 
     async def _change_status(self, message):
@@ -84,18 +82,21 @@ class DiscordLLMBot(Bot):
 
         async with message.channel.typing():
             self.model_lock = True
-            memory = self._get_memory(message.channel.id)
+            memory = self.memories.get_memory(message.channel.id)
             response = await self.model.evaluate(message_text, memory=memory)
             logging.info("Response: %s", response)
             await message.reply(response, mention_author=True)
+            self.memories.persist_memory()
 
         await asyncio.sleep(1)
         self.model_lock = False
 
     async def on_ready(self):
+        """Called when the bot is ready."""
         logging.info("Bot %s is connected to server.", self.user.display_name)
 
     async def on_message(self, message):
+        """Called when a message is sent in a channel the bot is in."""
         if message.author == self.user:
             return
 

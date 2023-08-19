@@ -2,7 +2,7 @@ import os
 import logging
 import gpt4all
 from dotenv import load_dotenv
-from classes import GeneralLLMModel, MemoryModel, RPGModel, Translator
+from translator import GeneralLLMModel, MemoryModel, RPGModel, Translator
 
 load_dotenv()
 

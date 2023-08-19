@@ -1,5 +1,5 @@
 import logging
-from classes.llm_model import LLMModel
+from llms_models.llm_model import LLMModel
 
 
 class RPGModel(LLMModel):
