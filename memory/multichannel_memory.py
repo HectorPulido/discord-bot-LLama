@@ -47,9 +47,9 @@ class MultiChannelMemory:
         with open(self.load_path, "rb") as file:
             try:
                 self.memories = pickle.load(file)
-            except Exception as _:
+            except Exception as exception:
                 self.memories = {}
-                logging.info("Memory not loaded...")
+                logging.info("Memory not loaded... Error: %s", exception)
                 return False
         logging.info("Memory Loaded...")
         return True

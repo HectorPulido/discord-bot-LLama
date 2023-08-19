@@ -1,3 +1,6 @@
+"""
+Script to use the bot in offline mode.
+"""
 import os
 import logging
 import gpt4all

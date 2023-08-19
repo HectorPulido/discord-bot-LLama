@@ -22,7 +22,7 @@ class MemoryModel:
         if len(self.conversation) < self.memory_size:
             conversarion_min = self.conversation
         else:
-            conversarion_min = self.conversation[-self.memory_size :]
+            conversarion_min = self.conversation[-self.memory_size:]
 
         input_text = "\n".join([f"> {i}" for i in conversarion_min])
         return input_text
