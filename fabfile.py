@@ -24,7 +24,7 @@ def _activate_env(command, venv_path, python_file):
 
 @task
 def start_bot(command):
-    command.run("git pull")
+    # command.run("git pull")
 
     if os.getenv("VIRTUAL_ENV") is not None:
         print("Using virtualenv")

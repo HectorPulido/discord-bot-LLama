@@ -16,6 +16,7 @@ class Translator:
             "£": "<pound> ",
             "€": "<euro> ",
             "¥": "<yen> ",
+            "pequeñin": "<pe>",
         }
         self.reverse_special_tokens_dict = {
             v.strip(): k for k, v in self.special_tokens_dict.items()

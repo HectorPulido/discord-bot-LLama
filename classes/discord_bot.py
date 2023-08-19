@@ -11,9 +11,13 @@ from classes import GeneralLLMModel, MemoryModel, Translator
 
 
 class DiscordLLMBot(Bot):
-    def __init__(self, model_name, memory_size=5):
+    def __init__(self, model_name, memory_size=5, use_translator=False):
         llm_model = gpt4all.GPT4All(model_name)
-        translator = Translator()
+
+        translator = None
+        if use_translator:
+            logging.info("Using translator...")
+            translator = Translator()
 
         self.model = GeneralLLMModel(
             llm_model, translator, prompt_path="prompts/base_prompt.txt", temp=0.9
@@ -37,14 +41,14 @@ class DiscordLLMBot(Bot):
         return self.memories[channel_id]
 
     def _clear_memory(self, message):
-        if not message.author.server_permissions.administrator:
+        if not message.author.guild_permissions.manage_messages:
             message.reply("You don't have permission to do that.", mention_author=True)
             return
         self.memories = {}
         message.reply("Memory cleared.", mention_author=True)
 
     async def _change_status(self, message):
-        if not message.author.server_permissions.administrator:
+        if not message.author.guild_permissions.manage_messages:
             message.reply("You don't have permission to do that.", mention_author=True)
             return
 

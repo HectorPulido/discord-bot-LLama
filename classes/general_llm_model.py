@@ -47,6 +47,7 @@ class GeneralLLMModel(LLMModel):
         output = re.split(r"\n+|#", output)[0].strip()
         output = output.replace(">", "")
         output = output.split(":", maxsplit=1)[-1].strip()
+        output = output.replace("*", "\*")
 
         memory.set_last_response(output)
 
