@@ -40,16 +40,20 @@ class DiscordLLMBot(Bot):
             self.memories[channel_id] = MemoryModel(memory_size=self.memory_size)
         return self.memories[channel_id]
 
-    def _clear_memory(self, message):
+    async def _clear_memory(self, message):
         if not message.author.guild_permissions.manage_messages:
-            message.reply("You don't have permission to do that.", mention_author=True)
+            await message.reply(
+                "You don't have permission to do that.", mention_author=True
+            )
             return
         self.memories = {}
-        message.reply("Memory cleared.", mention_author=True)
+        await message.reply("Memory cleared.", mention_author=True)
 
     async def _change_status(self, message):
         if not message.author.guild_permissions.manage_messages:
-            message.reply("You don't have permission to do that.", mention_author=True)
+            await message.reply(
+                "You don't have permission to do that.", mention_author=True
+            )
             return
 
         logging.info("Changing status...")
