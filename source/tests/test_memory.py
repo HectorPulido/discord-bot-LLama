@@ -1,7 +1,4 @@
-import sys
-sys.path.append('path')
-
-from memory_model import MemoryModel
+from ..memory_model import MemoryModel
 
 
 def test_memory():
