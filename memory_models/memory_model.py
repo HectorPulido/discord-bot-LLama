@@ -50,3 +50,9 @@ class MemoryModel:
         Method for append message to conversation
         """
         self.conversation.append(input_text)
+
+    def get_conversation_length(self):
+        """
+        Method for get conversation length
+        """
+        return len(self.conversation)

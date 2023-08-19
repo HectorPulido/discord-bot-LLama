@@ -9,7 +9,7 @@ import gpt4all
 from discord.ext.commands import Bot
 from discord.channel import TextChannel
 
-from memory import MultiChannelMemory
+from memory_models import MultiChannelMemory
 from translator import Translator
 from llms_models import GeneralLLMModel
 
