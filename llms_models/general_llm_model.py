@@ -1,9 +1,16 @@
+"""
+General class for LLM models.
+"""
 import re
 import logging
 from llms_models.llm_model import LLMModel
 
 
 class GeneralLLMModel(LLMModel):
+    """
+    Class for LLM models that don't require any special processing.
+    """
+
     def __init__(
         self,
         llm_model,
@@ -21,6 +28,9 @@ class GeneralLLMModel(LLMModel):
         )
 
     def evaluate_sync(self, initial_input_text, memory):
+        """
+        Get the model's response to the input text.
+        """
         input_text = self._translate_input(initial_input_text)
 
         memory.append_conversation(input_text)
@@ -47,7 +57,7 @@ class GeneralLLMModel(LLMModel):
         output = re.split(r"\n+|#", output)[0].strip()
         output = output.replace(">", "")
         output = output.split(":", maxsplit=1)[-1].strip()
-        output = output.replace("*", "\*")
+        output = output.replace("*", r"\*")
 
         memory.set_last_response(output)
 

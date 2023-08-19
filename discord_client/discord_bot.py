@@ -1,3 +1,6 @@
+"""
+Discord client class.
+"""
 import re
 import logging
 import asyncio
@@ -12,6 +15,10 @@ from llms_models import GeneralLLMModel
 
 
 class DiscordLLMBot(Bot):
+    """
+    This class represents a Discord bot that uses a GPT-3 model to respond to messages.
+    """
+
     def __init__(self, model_name, memory_size=5, use_translator=False):
         llm_model = gpt4all.GPT4All(model_name)
 

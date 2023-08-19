@@ -1,7 +1,15 @@
+"""
+This module contains the Translator class, which is used to translate messages
+"""
+
 from transformers import pipeline
 
 
 class Translator:
+    """
+    Class for translating messages.
+    """
+
     def __init__(self):
         self.special_tokens_dict = {
             ")": "<cp> ",
@@ -30,6 +38,9 @@ class Translator:
         )
 
     def english_to_spanish(self, text):
+        """
+        Translate from English to Spanish.
+        """
         for key, value in self.special_tokens_dict.items():
             text = text.replace(key, value)
 
@@ -43,6 +54,9 @@ class Translator:
         return text
 
     def spanish_to_english(self, text):
+        """
+        Translate from Spanish to English.
+        """
         if "¿" not in text and "?" in text:
             text = "¿" + text
 

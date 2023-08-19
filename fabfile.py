@@ -1,3 +1,7 @@
+"""
+fabfile util for running the bot
+"""
+
 import os
 import platform
 from fabric import task
@@ -24,7 +28,9 @@ def _activate_env(command, venv_path, python_file):
 
 @task
 def start_bot(command):
-    # command.run("git pull")
+    """
+    Principal task for running the bot
+    """
 
     if os.getenv("VIRTUAL_ENV") is not None:
         print("Using virtualenv")

@@ -1,9 +1,16 @@
+"""
+Base class for LLM models
+"""
 import logging
 from abc import ABC, abstractmethod
 from utils import to_thread
 
 
 class LLMModel(ABC):
+    """
+    Base class for LLM models
+    """
+
     def __init__(
         self,
         llm_model,
@@ -31,11 +38,16 @@ class LLMModel(ABC):
 
     @to_thread
     def evaluate(self, initial_input_text, memory):
+        """
+        get the response from the model
+        """
         return self.evaluate_sync(initial_input_text, memory)
 
     @abstractmethod
     def evaluate_sync(self, initial_input_text, memory):
-        pass
+        """
+        abstract method for getting the response from the model
+        """
 
     def _generate_prompt(self, memory):
         input_text = memory.historial_conversation()

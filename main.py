@@ -1,3 +1,7 @@
+"""
+Entry point of the application.
+"""
+
 import os
 import logging
 from dotenv import load_dotenv
