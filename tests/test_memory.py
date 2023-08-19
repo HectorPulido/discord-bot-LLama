@@ -1,5 +1,6 @@
 from memory_model import MemoryModel
 
+
 def test_memory():
     memory = MemoryModel(3)
 
