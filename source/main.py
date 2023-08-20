@@ -14,6 +14,14 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 MEMORY_SIZE = int(os.getenv("MEMORY_SIZE"))
 TRANSLATOR = bool(os.getenv("TRANSLATOR"))
 
+CHAT_CHANNELS = os.getenv("CHAT_CHANNELS")
+EMOJI_ONLY_CHANNELS = os.getenv("EMOJI_ONLY_CHANNELS")
+
+DICT_CHANNELS = {
+    "CHAT_CHANNELS": CHAT_CHANNELS.split(","),
+    "EMOJI_ONLY_CHANNELS": EMOJI_ONLY_CHANNELS.split(","),
+}
+
 logging.basicConfig(
     level=logging.DEBUG,
     filename="app.log",
@@ -23,5 +31,5 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    bot = DiscordLLMBot(MODEL_NAME, MEMORY_SIZE, TRANSLATOR)
+    bot = DiscordLLMBot(MODEL_NAME, DICT_CHANNELS, MEMORY_SIZE, TRANSLATOR)
     bot.run(TOKEN_DISCORD)

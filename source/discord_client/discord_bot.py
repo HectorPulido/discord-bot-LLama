@@ -12,6 +12,8 @@ from discord.channel import TextChannel
 from memory_models import MultiChannelMemory
 from translator import Translator
 from llms_models import GeneralLLMModel
+from extra import clear_memory, change_status, manage_emojis_channel
+from utils import is_valid_channel
 
 
 class DiscordLLMBot(Bot):
@@ -19,7 +21,7 @@ class DiscordLLMBot(Bot):
     This class represents a Discord bot that uses a GPT-3 model to respond to messages.
     """
 
-    def __init__(self, model_name, memory_size=5, use_translator=False):
+    def __init__(self, model_name, channel_data, memory_size=5, use_translator=False):
         llm_model = gpt4all.GPT4All(model_name)
 
         translator = None
@@ -35,35 +37,16 @@ class DiscordLLMBot(Bot):
         )
         self.model_lock = False
         self.discord_commands = {
-            "!change_status": self._change_status,
-            "!clear": self._clear_memory,
+            "!change_status": change_status,
+            "!clear": clear_memory,
         }
+        self.channel_data = channel_data
 
         self.memory_size = memory_size
 
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(command_prefix="!", intents=intents)
-
-    async def _clear_memory(self, message):
-        if not message.author.guild_permissions.manage_messages:
-            await message.reply(
-                "You don't have permission to do that.", mention_author=True
-            )
-            return
-        self.memories.clear_all_memory()
-        await message.reply("Memory cleared.", mention_author=True)
-
-    async def _change_status(self, message):
-        if not message.author.guild_permissions.manage_messages:
-            await message.reply(
-                "You don't have permission to do that.", mention_author=True
-            )
-            return
-
-        logging.info("Changing status...")
-        new_status = message.content.split("!change_status")[1]
-        await self.change_presence(activity=discord.Game(name=new_status))
 
     async def _check_commands(self, message):
         for command, func in self.discord_commands.items():
@@ -73,7 +56,7 @@ class DiscordLLMBot(Bot):
         return False
 
     async def _llm_response(self, message):
-        if not isinstance(message.channel, TextChannel):
+        if not is_valid_channel(message, self.channel_data["CHAT_CHANNELS"]):
             await message.reply("Sorry, I can't talk here.", mention_author=True)
             return
 
@@ -108,6 +91,8 @@ class DiscordLLMBot(Bot):
             return
 
         await self._check_commands(message)
+
+        await manage_emojis_channel(message, self.channel_data["EMOJI_ONLY_CHANNELS"])
 
         if not self.user.mentioned_in(message):
             return

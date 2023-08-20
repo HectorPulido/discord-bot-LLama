@@ -131,4 +131,4 @@ logs.txt
 
 
 gpt4all/
-.mem
+*.mem

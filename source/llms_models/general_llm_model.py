@@ -51,6 +51,7 @@ class GeneralLLMModel(LLMModel):
     def _clear_conversation_if_needed(self, output, initial_input_text, memory):
         if output in [memory.get_last_response(), initial_input_text, ""]:
             memory.clear_conversation()
+            logging.debug("Memory cleared...")
 
     def _process_output(self, output, memory):
         output = output.strip()
