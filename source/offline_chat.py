@@ -5,7 +5,9 @@ import os
 import logging
 import gpt4all
 from dotenv import load_dotenv
-from translator import GeneralLLMModel, MemoryModel, Translator
+from memory_models import MemoryModel
+from translator import Translator
+from llms_models import GeneralLLMModel
 
 load_dotenv()
 
