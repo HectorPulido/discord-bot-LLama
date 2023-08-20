@@ -37,4 +37,4 @@ jobs:
         black --check $(git ls-files '*.py')
     - name: Test with pytest
       run: |
-        PYTHONPATH=source pytest
+        PYTHONPATH=source pytest source/tests
