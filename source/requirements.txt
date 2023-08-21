@@ -5,6 +5,6 @@ sacremoses==0.0.53
 transformers==4.30.2
 discord.py==2.3.0
 python-dotenv==1.0.0
-gpt4all==0.3.4
+gpt4all==0.1.7
 transformers[sentencepiece]==4.30.2
 fabric==3.1.0
