@@ -17,6 +17,7 @@ After installing Python 3, you can follow the instructions:
 
 ## For ARM
 [Follow this instructions](https://github.com/nomic-ai/gpt4all/issues/553#issuecomment-1584167667)
+If you get problems with vulkan, downgrade your version to the commit `d3ba1295a764d1803746a2340024c1f7379f06a1`
 
 ## In colab
 To use LLAMA in colab, 
