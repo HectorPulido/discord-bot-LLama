@@ -63,9 +63,6 @@ pip3 install -e .
 
 Voila, now you have the correct GPT4ALL version for Raspberry Pi, Orange Pi, Android, etc.
 
-[Follow this instructions](https://github.com/nomic-ai/gpt4all/issues/553#issuecomment-1584167667)
-If you get problems with vulkan, downgrade your version to the commit `d3ba1295a764d1803746a2340024c1f7379f06a1`
-
 ## In colab
 To use LLAMA in colab, 
 1. you need to have a google account. 
