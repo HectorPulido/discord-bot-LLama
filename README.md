@@ -1,7 +1,20 @@
 # LLAMA - Discord Chatbot
-This repo is an implementartion of [LLAMA/ALPACA](https://github.com/tloen/alpaca-lora/). It's a chatbot made with Python that simulates natural conversation with users. The chatbot is designed to be used in the **Discord** platform, providing an interactive experience for the users. LLAMA can run in user hardware or in colab.
+This repo is an implementartion of LLAMA 2. It's a chatbot made with Python that simulates natural conversation with users. The chatbot is designed to be used in the **Discord** platform, providing an interactive experience for the users. LLAMA can run in user hardware or in colab.
 
 ![image demo of the game](/img/example.png)<br/>
+
+## Create the bot account
+1. Make sure you’re logged on to the [Discord website](https://discord.com/).
+2. Navigate to the [Applications](https://discord.com/developers/applications).
+3. Click on the “New Application” button.
+4. Give the application a name and click “Create”.
+5. Navigate to the “Bot” tab to configure it.
+6. Make sure that Public Bot is ticked if you want others to invite your bot.
+7. Copy the token using the “Copy” button. **do not share this token.**
+8. Go to the “OAuth2 > URL Generator” tab.
+9. Tick the “bot” checkbox under “scopes”.
+10. Tick the permissions required for your bot to function under “Bot Permissions”.
+11. Now the resulting URL can be used to add your bot to a server. Copy and paste the URL into your browser, choose a server to invite the bot to, and click “Authorize”
 
 ## Installation
 The following instructions will help you install LLAMA on your machine or in colab.
