@@ -12,7 +12,7 @@ load_dotenv()
 TOKEN_DISCORD = os.getenv("TOKEN_DISCORD")
 MODEL_NAME = os.getenv("MODEL_NAME")
 MEMORY_SIZE = int(os.getenv("MEMORY_SIZE"))
-TRANSLATOR = bool(os.getenv("TRANSLATOR"))
+TRANSLATOR = bool(os.getenv("TRANSLATOR") != "False")
 
 CHAT_CHANNELS = os.getenv("CHAT_CHANNELS")
 EMOJI_ONLY_CHANNELS = os.getenv("EMOJI_ONLY_CHANNELS")

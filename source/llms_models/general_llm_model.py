@@ -56,11 +56,6 @@ class GeneralLLMModel(LLMModel):
 
     def _process_output(self, output, memory):
         output = output.strip()
-        output = re.split(r"\n+|#", output)[0].strip()
-        output = output.replace(">", "")
-        output = output.split(":", maxsplit=1)[-1].strip()
-        output = output.replace("*", r"\*")
-
         memory.set_last_response(output)
 
         return output
