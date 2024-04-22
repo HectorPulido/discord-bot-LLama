@@ -1,0 +1,13 @@
+services:
+  ollama:
+    restart: always
+    image: ollama/ollama
+  beat: 
+    restart: always
+    build: .
+    depends_on:
+      - ollama
+    command: python main.py
+    volumes:
+      - .:/code
+

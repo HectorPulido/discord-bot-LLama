@@ -3,7 +3,7 @@ Test suite for the memory module
 """
 
 import os
-from source.memory_models import MemoryModel, MultiChannelMemory
+from memory_models import MemoryModel, MultiChannelMemory
 
 PICKLE_PATH = "test.pkl"
 
@@ -21,12 +21,14 @@ def test_memory_size():
     memory.append_conversation("Bien y tu?")
 
     assert memory.get_conversation_length() == 3
-    assert len(memory.historial_conversation().split("\n")) == 3
+    assert len(memory.historial_conversation()) == 3
 
     memory.append_conversation("Muy bien")
 
+    # The conversation length is 4 but the memory size is 3 so
+    # the historial_conversation should return the last 3 messages
     assert memory.get_conversation_length() == 4
-    assert len(memory.historial_conversation().split("\n")) == 3
+    assert len(memory.historial_conversation()) == 3
 
     memory.clear_conversation()
     assert memory.get_conversation_length() == 0

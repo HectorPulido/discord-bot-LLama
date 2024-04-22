@@ -1,6 +1,7 @@
 """
 General class for LLM models.
 """
+
 import re
 import logging
 from llms_models.llm_model import LLMModel
@@ -13,7 +14,7 @@ class GeneralLLMModel(LLMModel):
 
     def __init__(
         self,
-        llm_model,
+        llm_model: str,
         translator=None,
         prompt_path=None,
         prompt=None,
@@ -33,7 +34,7 @@ class GeneralLLMModel(LLMModel):
         """
         input_text = self._translate_input(initial_input_text)
 
-        memory.append_conversation(input_text)
+        memory.append_conversation(input_text, "user")
         prompt = self._generate_prompt(memory)
         logging.debug("========= Prompt =========")
         logging.debug("Prompt: %s", prompt)
@@ -43,7 +44,7 @@ class GeneralLLMModel(LLMModel):
         self._clear_conversation_if_needed(output, initial_input_text, memory)
 
         output = self._process_output(output, memory)
-        memory.append_conversation(f"Response: {output}")
+        memory.append_conversation(f"Response: {output}", "assistant")
         output = self._translate_output(output)
 
         return output

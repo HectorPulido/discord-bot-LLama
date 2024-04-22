@@ -5,7 +5,7 @@ Multichannel Memory model.
 import os
 import pickle
 import logging
-from memory_models import MemoryModel
+from .memory_model import MemoryModel
 
 
 class MultiChannelMemory:

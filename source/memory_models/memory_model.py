@@ -24,16 +24,15 @@ class MemoryModel:
         else:
             conversarion_min = self.conversation[-self.memory_size :]
 
-        input_text = "\n".join([f"> {i}" for i in conversarion_min])
-        return input_text
+        return conversarion_min
 
-    def set_last_response(self, response):
+    def set_last_response(self, response: str):
         """
         Last response setter
         """
         self.last_response = response
 
-    def get_last_response(self):
+    def get_last_response(self) -> str:
         """
         Last response getter
         """
@@ -45,13 +44,18 @@ class MemoryModel:
         """
         self.conversation.clear()
 
-    def append_conversation(self, input_text):
+    def append_conversation(self, input_text: str, role: str = "user"):
         """
         Method for append message to conversation
         """
-        self.conversation.append(input_text)
+        self.conversation.append(
+            {
+                "role": role,
+                "content": input_text,
+            }
+        )
 
-    def get_conversation_length(self):
+    def get_conversation_length(self) -> int:
         """
         Method for get conversation length
         """

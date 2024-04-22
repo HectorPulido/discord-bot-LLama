@@ -1,9 +1,9 @@
 """
 Script to use the bot in offline mode.
 """
+
 import os
 import logging
-import gpt4all
 from dotenv import load_dotenv
 from memory_models import MemoryModel
 from translator import Translator
@@ -20,12 +20,9 @@ logging.basicConfig(
 )
 
 model_name = os.getenv("MODEL_NAME")
-llm_model = gpt4all.GPT4All(model_name)
 translator = Translator()
 
-bot = GeneralLLMModel(
-    llm_model, translator, prompt_path="prompts/base_prompt.txt", temp=0.9
-)
+bot = GeneralLLMModel("gemma:2b", None, prompt_path="prompts/base_prompt.txt", temp=0.9)
 memory = MemoryModel(memory_size=3)
 print("Bot is starting...")
 while True:

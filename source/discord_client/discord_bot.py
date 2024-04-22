@@ -1,13 +1,12 @@
 """
 Discord client class.
 """
+
 import re
 import logging
 import asyncio
 import discord
-import gpt4all
 from discord.ext.commands import Bot
-from discord.channel import TextChannel
 
 from memory_models import MultiChannelMemory
 from translator import Translator
@@ -21,16 +20,25 @@ class DiscordLLMBot(Bot):
     This class represents a Discord bot that uses a GPT-3 model to respond to messages.
     """
 
-    def __init__(self, model_name, channel_data, memory_size=5, use_translator=False):
-        llm_model = gpt4all.GPT4All(model_name)
-
+    def __init__(
+        self,
+        model_name: str,
+        channel_data: str,
+        ollama_url: str,
+        memory_size: int = 5,
+        use_translator: bool = False,
+    ):
         translator = None
         if use_translator:
             logging.info("Using translator...")
             translator = Translator()
 
         self.model = GeneralLLMModel(
-            llm_model, translator, prompt_path="prompts/base_prompt.txt", temp=0.9
+            model_name,
+            translator,
+            prompt_path="prompts/base_prompt.txt",
+            temp=0.9,
+            ollama_url=ollama_url,
         )
         self.memories = MultiChannelMemory(
             memory_size=memory_size, load_path="memory.mem"
