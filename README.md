@@ -59,7 +59,7 @@ docker-compose up
 
 6. Enjoy the bot! :tada:
 
-# If you need to run the bot on a Orange Pi 5 or some ARM device 
+### If you need to run the bot on a Orange Pi 5 or some ARM device 
 You can check the previous version of this bot and follow the instructions in the following link:
 https://github.com/HectorPulido/discord-bot-LLama/tree/6c79b3bf2d3956617f6789934320352ae776adc2
 
