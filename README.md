@@ -63,10 +63,9 @@ docker-compose up
 You can check the previous version of this bot and follow the instructions in the following link:
 https://github.com/HectorPulido/discord-bot-LLama/tree/6c79b3bf2d3956617f6789934320352ae776adc2
 
-# License
+## License
 This project is licensed under the MIT License. See the LICENSE file for details.
 <hr>
-
 
 <div align="center">
 <h3 align="center">Let's connect 😋</h3>
