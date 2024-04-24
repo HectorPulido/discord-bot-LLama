@@ -75,4 +75,7 @@ class MultiChannelMemory:
         """
         self.memories = {}
         if self.load_path is not None:
-            os.remove(self.load_path)
+            try:
+                os.remove(self.load_path)
+            except FileNotFoundError:
+                logging.info("Memory file not found...")

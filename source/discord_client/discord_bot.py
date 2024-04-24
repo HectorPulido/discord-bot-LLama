@@ -59,7 +59,7 @@ class DiscordLLMBot(Bot):
     async def _check_commands(self, message):
         for command, func in self.discord_commands.items():
             if command in message.content:
-                await func(message)
+                await func(self, message)
                 return True
         return False
 
