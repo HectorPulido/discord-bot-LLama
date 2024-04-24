@@ -2,6 +2,8 @@ services:
   ollama:
     restart: always
     image: ollama/ollama
+    volumes:
+      - ./ollama:/root/.ollama
   beat: 
     restart: always
     build: .

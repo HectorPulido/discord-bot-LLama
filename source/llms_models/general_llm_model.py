@@ -55,7 +55,11 @@ class GeneralLLMModel(LLMModel):
             logging.debug("Memory cleared...")
 
     def _process_output(self, output, memory):
+        output.replace("Response:", "").replace("response:", "").replace(
+            "RESPONSE:", ""
+        )
         output = output.strip()
+
         memory.set_last_response(output)
 
         return output

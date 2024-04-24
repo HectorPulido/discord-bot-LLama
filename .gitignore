@@ -134,3 +134,4 @@ gpt4all/
 *.mem
 
 .DS_Store
+source/ollama/
