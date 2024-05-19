@@ -117,18 +117,19 @@ class DiscordLLMBot(Bot):
 
             # Check for stable difussion
             if self.sd_client is not None:
-                await self.check_for_image(response, response_message)
+                await self.check_for_image(message_text, response, response_message)
 
             self.memories.persist_memory()
 
         await asyncio.sleep(1)
         self.model_lock = False
 
-    async def check_for_image(self, message_input: str, message: discord.Message):
+    async def check_for_image(self, message_input: str, message_output:str, message: discord.Message):
         """
         Check if must generate an image.
         """
-        response = await self.sd_llm_model.evaluate(message_input)
+        message_data = f"{message_input}\n{message_output}"
+        response = await self.sd_llm_model.evaluate(message_data)
         logging.info("SD Response: %s", response)
         if "N/A" in response.upper() or len(response) < 5:
             return None
