@@ -19,6 +19,19 @@ EMOJI_ONLY_CHANNELS = os.getenv("EMOJI_ONLY_CHANNELS")
 
 OLLAMA_URL = os.getenv("OLLAMA_URL")
 
+LLM_Data = {
+    "model_name": MODEL_NAME,
+    "ollama_url": OLLAMA_URL,
+}
+
+SD_CHECKPOINT = os.getenv("SD_CHECKPOINT")
+SD_URL = os.getenv("SD_URL")
+
+SD_Data = {
+    "checkpoint": SD_CHECKPOINT,
+    "url": SD_URL,
+}
+
 DICT_CHANNELS = {
     "CHAT_CHANNELS": CHAT_CHANNELS.split(","),
     "EMOJI_ONLY_CHANNELS": EMOJI_ONLY_CHANNELS.split(","),
@@ -33,5 +46,5 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    bot = DiscordLLMBot(MODEL_NAME, DICT_CHANNELS, OLLAMA_URL, MEMORY_SIZE, TRANSLATOR)
+    bot = DiscordLLMBot(LLM_Data, SD_Data, DICT_CHANNELS, MEMORY_SIZE, TRANSLATOR)
     bot.run(TOKEN_DISCORD)

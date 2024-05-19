@@ -66,17 +66,29 @@ class LLMModel(ABC):
             self.prompt = prompt
 
     @to_thread
-    def evaluate(self, initial_input_text: str, memory: MemoryModel) -> str:
+    def evaluate(self, initial_input_text: str, memory: MemoryModel = None) -> str:
         """
         get the response from the model
         """
         return self.evaluate_sync(initial_input_text, memory)
 
     @abstractmethod
-    def evaluate_sync(self, initial_input_text: str, memory: MemoryModel) -> str:
+    def evaluate_sync(self, initial_input_text: str, memory: MemoryModel = None) -> str:
         """
         abstract method for getting the response from the model
         """
+
+    def _generate_bare_prompt(self, input_text: str):
+        return [
+            {
+                "role": "system",
+                "content": self.prompt,
+            },
+            {
+                "role": "user",
+                "content": input_text,
+            },
+        ]
 
     def _generate_prompt(self, memory: MemoryModel):
         conversation = memory.historial_conversation()

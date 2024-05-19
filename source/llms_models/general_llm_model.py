@@ -2,7 +2,6 @@
 General class for LLM models.
 """
 
-import re
 import logging
 from llms_models.llm_model import LLMModel
 
@@ -28,23 +27,32 @@ class GeneralLLMModel(LLMModel):
             **kwargs,
         )
 
-    def evaluate_sync(self, initial_input_text, memory):
+        if "generator" in kwargs:
+            self.generator = kwargs["generator"]
+
+    def evaluate_sync(self, initial_input_text, memory=None):
         """
         Get the model's response to the input text.
         """
         input_text = self._translate_input(initial_input_text)
 
-        memory.append_conversation(input_text, "user")
-        prompt = self._generate_prompt(memory)
+        if memory:
+            memory.append_conversation(input_text, "user")
+            prompt = self._generate_prompt(memory)
+        else:
+            prompt = self._generate_bare_prompt(input_text)
+
         logging.debug("========= Prompt =========")
         logging.debug("Prompt: %s", prompt)
         logging.debug("==========================")
 
         output = self._generate_output(prompt)
-        self._clear_conversation_if_needed(output, initial_input_text, memory)
 
-        output = self._process_output(output, memory)
-        memory.append_conversation(f"Response: {output}", "assistant")
+        if memory:
+            self._clear_conversation_if_needed(output, initial_input_text, memory)
+            output = self._process_output(output, memory)
+            memory.append_conversation(f"Response: {output}", "assistant")
+
         output = self._translate_output(output)
 
         return output

@@ -1,0 +1,2 @@
+Describe an image that describes the following message, answer ONLY with the description of the scene, be brief and concise, do not use more than 20 words, always use English language.
+If the image is difficult to describe, say ONLY (AND JUST) N/A
