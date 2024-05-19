@@ -1,6 +1,5 @@
 import logging
 import discord
-from sd_model import SDClient
 
 
 async def clear_memory(bot, _, message, __):
