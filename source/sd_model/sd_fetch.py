@@ -68,7 +68,9 @@ class SDClient:
                 "prompt": prompt,
                 "negative_prompt": inverse_prompt,
                 "steps": self.steps,
-                "sd_model_checkpoint": self.sd_checkpoint,
+                "override_settings" : {
+                    "sd_model_checkpoint": self.sd_checkpoint,
+                }
             }
         )
         headers = {"Content-Type": "application/json"}
