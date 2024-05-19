@@ -9,7 +9,27 @@ services:
     build: .
     depends_on:
       - ollama
+      - stablediff
     command: python main.py
     volumes:
       - .:/code
-
+  stablediff:
+    build: 
+      context: .
+      dockerfile: Dockerfile.sd
+    environment:
+      TZ: "America/Bogota"
+      COMMANDLINE_ARGS: "--precision full --use-cpu all --no-half --skip-torch-cuda-test --enable-insecure-extension-access --listen  --api"
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      ". /stablediff.env; echo launch.py $$COMMANDLINE_ARGS;
+      if [ ! -d /stablediff-web/.git ]; then
+        cp -a /sdtemp/. /stablediff-web/
+      fi;
+      python launch.py"
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./stablediff.env:/stablediff.env
+      - ./stablediff-web:/stablediff-web
+      - ./stablediff-models:/stablediff-web/models/Stable-diffusion

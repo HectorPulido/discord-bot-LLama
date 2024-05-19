@@ -136,3 +136,6 @@ gpt4all/
 .DS_Store
 source/ollama/
 *.png
+source/stablediff.env/
+source/stablediff-models/
+source/stablediff-web/

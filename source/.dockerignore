@@ -1,3 +1,6 @@
 /ollama/
 .pytest_cache/
 */__pycache__/*
+/stablediff.env/
+/stablediff-models/
+/stablediff-web/

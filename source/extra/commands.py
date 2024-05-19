@@ -49,7 +49,7 @@ async def generate_image(_, command, message, ctx):
         content = message.content.split(command)[1].strip()
 
         inverse_prompt = None
-        if content.contains("|"):
+        if "|" in content:
             content, inverse_prompt = content.split("|")
 
         file_name = await sd_client.txt2img(content, inverse_prompt)
