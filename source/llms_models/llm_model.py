@@ -102,6 +102,20 @@ class LLMModel(ABC):
             ] + conversation
         return conversation
 
+    @to_thread
+    def _generate_stream_output(self, prompt):
+        try:
+            stream = self.client_ollama.chat(
+                model=self.llm_model,
+                options=self.option,
+                messages=prompt,
+                stream=True,
+            )
+            return stream
+        except Exception as e:
+            logging.error("Error generating output: %s", e)
+            return ""
+
     def _generate_output(self, prompt):
         try:
             response = self.client_ollama.chat(

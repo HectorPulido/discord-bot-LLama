@@ -4,7 +4,6 @@ Discord client class.
 
 import re
 import logging
-import asyncio
 import discord
 from discord.ext.commands import Bot
 
@@ -12,7 +11,7 @@ from memory_models import MultiChannelMemory
 from translator import Translator
 from llms_models import GeneralLLMModel
 from extra import clear_memory, change_status, manage_emojis_channel, generate_image
-from utils import is_valid_channel
+from utils import is_valid_channel, Lock
 from sd_model import SDClient
 
 
@@ -20,6 +19,10 @@ class DiscordLLMBot(Bot):
     """
     This class represents a Discord bot that uses a GPT-3 model to respond to messages.
     """
+
+    BASE_PROMPT_PATH = "prompts/base_prompt.txt"
+    SD_PROMPT_PATH = "prompts/sd_prompt.txt"
+    SD_INVERSE_PROMPT_PATH = "prompts/sd_inverse_prompt.txt"
 
     def __init__(
         self,
@@ -29,105 +32,109 @@ class DiscordLLMBot(Bot):
         memory_size: int = 5,
         use_translator: bool = False,
     ):
-        translator = None
-        if use_translator:
-            logging.info("Using translator...")
-            translator = Translator()
+        intents = discord.Intents.default()
+        intents.message_content = True
+        super().__init__(command_prefix="!", intents=intents)
 
-        model_name = LLM_Data["model_name"]
-        ollama_url = LLM_Data["ollama_url"]
-
+        self.translator = Translator() if use_translator else None
         self.model = GeneralLLMModel(
-            model_name,
-            translator,
-            prompt_path="prompts/base_prompt.txt",
+            LLM_Data["model_name"],
+            self.translator,
+            prompt_path=self.BASE_PROMPT_PATH,
             temp=0.9,
-            ollama_url=ollama_url,
+            ollama_url=LLM_Data.get("ollama_url"),
         )
 
-        self.sd_llm_model = None
-        self.sd_client = None
-        if "url" in SD_Data and "checkpoint" in SD_Data:
-            self.sd_llm_model = GeneralLLMModel(
-                model_name,
+        # Initialize Stable Diffusion if data is provided
+        self.sd_client = (
+            SDClient(
+                SD_Data["url"], SD_Data["checkpoint"], 10, self.SD_INVERSE_PROMPT_PATH
+            )
+            if SD_Data.get("url") and SD_Data.get("checkpoint")
+            else None
+        )
+
+        self.sd_llm_model = (
+            GeneralLLMModel(
+                LLM_Data["model_name"],
                 None,
-                prompt_path="prompts/sd_prompt.txt",
-                temp=0.9,
-                ollama_url=ollama_url,
+                prompt_path=self.SD_PROMPT_PATH,
+                temp=0.1,
+                ollama_url=LLM_Data.get("ollama_url"),
             )
-            self.sd_client = SDClient(
-                SD_Data["url"],
-                SD_Data["checkpoint"],
-                10,
-                "prompts/sd_inverse_prompt.txt",
-            )
-
-        self.memories = MultiChannelMemory(
-            memory_size=memory_size, load_path="memory.mem"
+            if self.sd_client
+            else None
         )
-        self.model_lock = False
+
+        self.memories = MultiChannelMemory(memory_size, "memory.mem")
+        self.channel_data = channel_data
+
+        # Context for command functions
+        self.ctx = {"sd_client": self.sd_client}
+
         self.discord_commands = {
             "!change_status": change_status,
             "!clear": clear_memory,
             "!generate-image": generate_image,
         }
-        self.ctx = {
-            "sd_client": self.sd_client,
-        }
 
-        self.channel_data = channel_data
-
-        self.memory_size = memory_size
-
-        intents = discord.Intents.default()
-        intents.message_content = True
-        super().__init__(command_prefix="!", intents=intents)
+        self.model_lock = Lock(False)
 
     async def _check_commands(self, message):
-        while self.model_lock:
-            logging.info("Waiting for model to unlock...")
-            await asyncio.sleep(10)
+        await self.model_lock.wait_lock()
 
         for command, func in self.discord_commands.items():
             if command in message.content:
-                self.model_lock = True
+                self.lock()
                 await func(self, command, message, self.ctx)
-                self.model_lock = False
+                self.unlock()
                 return True
         return False
 
-    async def _llm_response(self, message):
-        while self.model_lock:
-            logging.info("Waiting for model to unlock...")
-            await asyncio.sleep(10)
-
+    def _message_text_cleaner(self, message: discord.Message) -> str:
         message_text = str(message.content)
         message_text = re.sub(r"<@\d+>", "", message_text).strip()[-100:]
         message_text = f"{message.author.display_name}: {message_text}"
+        return message_text
+
+    def _edit_message_callback(self, message, max_iterations=5):
+        async def message_callback(output, force=False, iteration=0):
+            if len(output) < 5:
+                return
+            if force or iteration % max_iterations == 0:
+                await message.edit(content=output)
+
+        return message_callback
+
+    async def _llm_response(self, message):
+        await self.model_lock.wait_lock(5)
+
+        message_text = self._message_text_cleaner(message)
 
         logging.info("Message received in %s: %s", message.channel.id, message_text)
 
         async with message.channel.typing():
-            self.model_lock = True
+            self.model_lock.lock()
             memory = self.memories.get_memory(message.channel.id)
-            response = await self.model.evaluate(message_text, memory=memory)
 
-            logging.info("Response: %s", response)
-            response_message = await message.reply(response, mention_author=True)
+            response_message = await message.reply("*Pensando...*", mention_author=True)
+            callback = self._edit_message_callback(response_message)
+
+            response = await self.model.evaluate_stream(
+                message_text, callback, memory=memory
+            )
 
             # Check for stable difussion
             if self.sd_client is not None:
-                await self.check_for_image(message_text, response, response_message)
+                await self._check_for_image(message_text, response, response_message)
 
             self.memories.persist_memory()
 
-        await asyncio.sleep(1)
-        self.model_lock = False
+        self.model_lock.unlock()
 
-    async def check_for_image(self, message_input: str, message_output:str, message: discord.Message):
-        """
-        Check if must generate an image.
-        """
+    async def _check_for_image(
+        self, message_input: str, message_output: str, message: discord.Message
+    ):
         message_data = f"{message_input}\n{message_output}"
         response = await self.sd_llm_model.evaluate(message_data)
         logging.info("SD Response: %s", response)

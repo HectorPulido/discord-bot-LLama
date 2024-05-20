@@ -4,6 +4,7 @@ General class for LLM models.
 
 import logging
 from llms_models.llm_model import LLMModel
+from utils import to_thread
 
 
 class GeneralLLMModel(LLMModel):
@@ -30,12 +31,8 @@ class GeneralLLMModel(LLMModel):
         if "generator" in kwargs:
             self.generator = kwargs["generator"]
 
-    def evaluate_sync(self, initial_input_text, memory=None):
-        """
-        Get the model's response to the input text.
-        """
+    def _get_prompt(self, initial_input_text, memory=None):
         input_text = self._translate_input(initial_input_text)
-
         if memory:
             memory.append_conversation(input_text, "user")
             prompt = self._generate_prompt(memory)
@@ -46,14 +43,51 @@ class GeneralLLMModel(LLMModel):
         logging.debug("Prompt: %s", prompt)
         logging.debug("==========================")
 
-        output = self._generate_output(prompt)
+        return prompt
 
+    def _post_process(self, output, initial_input_text, memory=None):
         if memory:
             self._clear_conversation_if_needed(output, initial_input_text, memory)
             output = self._process_output(output, memory)
             memory.append_conversation(f"Response: {output}", "assistant")
 
         output = self._translate_output(output)
+
+        logging.debug("========= RESPONSE =========")
+        logging.debug("RESPONSE: %s", output)
+        logging.debug("==========================")
+
+        return output
+
+    async def evaluate_stream(self, initial_input_text, callback, memory=None):
+        """
+        Get the model's response to the input text.
+        """
+        prompt = self._get_prompt(initial_input_text, memory)
+
+        stream = await self._generate_stream_output(prompt)
+        output = ""
+        iteration = 0
+
+        for chunk in stream:
+            iteration += 1
+            output += chunk["message"]["content"]
+            await callback(output, iteration=iteration)
+
+        await callback(output, True)
+
+        output = self._post_process(output, initial_input_text, memory)
+
+        await callback(output, True)
+        return output
+
+    def evaluate_sync(self, initial_input_text, memory=None):
+        """
+        Get the model's response to the input text.
+        """
+        prompt = self._get_prompt(initial_input_text, memory)
+        output = self._generate_output(prompt)
+        output = self._post_process(output, initial_input_text, memory)
 
         return output
 
