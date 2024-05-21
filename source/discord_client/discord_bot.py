@@ -79,6 +79,7 @@ class DiscordLLMBot(Bot):
         }
 
         self.model_lock = Lock(False)
+        self.sd_lock = Lock(False)
 
     async def _check_commands(self, message):
         await self.model_lock.wait_lock()
@@ -99,7 +100,7 @@ class DiscordLLMBot(Bot):
 
     def _edit_message_callback(self, message, max_iterations=5):
         async def message_callback(output, force=False, iteration=0):
-            if len(output) < 5:
+            if len(output) < 15:
                 return
             if force or iteration % max_iterations == 0:
                 await message.edit(content=output)
@@ -107,7 +108,7 @@ class DiscordLLMBot(Bot):
         return message_callback
 
     async def _llm_response(self, message):
-        await self.model_lock.wait_lock(5)
+        await self.model_lock.wait_lock()
 
         message_text = self._message_text_cleaner(message)
 
@@ -124,13 +125,15 @@ class DiscordLLMBot(Bot):
                 message_text, callback, memory=memory
             )
 
-            # Check for stable difussion
-            if self.sd_client is not None:
-                await self._check_for_image(message_text, response, response_message)
-
             self.memories.persist_memory()
+            self.model_lock.unlock()
 
-        self.model_lock.unlock()
+        # Check for stable difussion
+        if self.sd_client is not None:
+            await self.sd_lock.wait_lock()
+            self.sd_lock.lock()
+            await self._check_for_image(message_text, response, response_message)
+            self.sd_lock.unlock()
 
     async def _check_for_image(
         self, message_input: str, message_output: str, message: discord.Message
@@ -141,7 +144,11 @@ class DiscordLLMBot(Bot):
         if "N/A" in response.upper() or len(response) < 5:
             return None
 
-        file_name = await self.sd_client.txt2img(response)
+        try:
+            file_name = await self.sd_client.txt2img(response)
+        except Exception as e:
+            logging.error("Error generating image: %s", e)
+            return
 
         if file_name is None:
             return

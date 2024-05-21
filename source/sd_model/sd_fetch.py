@@ -68,15 +68,15 @@ class SDClient:
                 "prompt": prompt,
                 "negative_prompt": inverse_prompt,
                 "steps": self.steps,
-                "override_settings" : {
+                "override_settings": {
                     "sd_model_checkpoint": self.sd_checkpoint,
-                }
+                },
             }
         )
         headers = {"Content-Type": "application/json"}
 
         # 5 mins
-        timeout = 60 * 5
+        timeout = 60 * 10
         response = requests.request(
             "POST", self.url, headers=headers, data=payload, timeout=timeout
         )
