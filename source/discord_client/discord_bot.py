@@ -86,9 +86,9 @@ class DiscordLLMBot(Bot):
 
         for command, func in self.discord_commands.items():
             if command in message.content:
-                self.lock()
+                await self.model_lock.lock()
                 await func(self, command, message, self.ctx)
-                self.unlock()
+                await self.model_lock.unlock()
                 return True
         return False
 
@@ -115,7 +115,7 @@ class DiscordLLMBot(Bot):
         logging.info("Message received in %s: %s", message.channel.id, message_text)
 
         async with message.channel.typing():
-            self.model_lock.lock()
+            await self.model_lock.lock()
             memory = self.memories.get_memory(message.channel.id)
 
             response_message = await message.reply("*Pensando...*", mention_author=True)
@@ -126,14 +126,14 @@ class DiscordLLMBot(Bot):
             )
 
             self.memories.persist_memory()
-            self.model_lock.unlock()
+            await self.model_lock.unlock()
 
         # Check for stable difussion
         if self.sd_client is not None:
             await self.sd_lock.wait_lock()
-            self.sd_lock.lock()
+            await self.sd_lock.lock()
             await self._check_for_image(message_text, response, response_message)
-            self.sd_lock.unlock()
+            await self.sd_lock.unlock()
 
     async def _check_for_image(
         self, message_input: str, message_output: str, message: discord.Message
