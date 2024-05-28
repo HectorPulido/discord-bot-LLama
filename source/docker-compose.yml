@@ -4,6 +4,7 @@ services:
     image: ollama/ollama
     volumes:
       - ./ollama:/root/.ollama
+
   beat: 
     restart: always
     build: .
@@ -13,7 +14,9 @@ services:
     command: python main.py
     volumes:
       - .:/code
+
   stablediff:
+    restart: always
     build: 
       context: .
       dockerfile: Dockerfile.sd
