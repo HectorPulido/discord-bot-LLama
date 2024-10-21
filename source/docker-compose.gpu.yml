@@ -1,6 +1,23 @@
+# services:
+#   nvidia:
+#     image: selenium/node-chrome:3.141.59
+    # runtime: nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [ gpu ]
+#     command: [ "nvidia-smi" ]
+
+
 services:
-  nvidia:
-    image: selenium/node-chrome:3.141.59
+  ollama:
+    restart: always
+    image: ollama/ollama
+    volumes:
+      - ./ollama:/root/.ollama
     runtime: nvidia
     deploy:
       resources:
@@ -9,4 +26,49 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
-    command: [ "nvidia-smi" ]
+
+  beat: 
+    restart: always
+    build: .
+    depends_on:
+      - ollama
+      - stablediff
+    command: python main.py
+    volumes:
+      - .:/code
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+
+  stablediff:
+    restart: always
+    build: 
+      context: .
+      dockerfile: Dockerfile.gpu.sd
+    environment:
+      TZ: "America/Bogota"
+      COMMANDLINE_ARGS: "--precision full all --no-half --skip-torch-cuda-test --enable-insecure-extension-access --listen  --api"
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      ". /stablediff.env; echo launch.py $$COMMANDLINE_ARGS;
+      if [ ! -d /stablediff-web/.git ]; then
+        cp -a /sdtemp/. /stablediff-web/
+      fi;
+      python launch.py"
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./stablediff.env:/stablediff.env
+      - ./stablediff-web:/stablediff-web
+      - ./stablediff-models:/stablediff-web/models/Stable-diffusion
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
