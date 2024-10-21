@@ -64,7 +64,7 @@ You can check the previous version of this bot and follow the instructions in th
 https://github.com/HectorPulido/discord-bot-LLama/tree/6c79b3bf2d3956617f6789934320352ae776adc2
 
 ### GPU Support - Only tested on Ubuntu and Nvidia
-
+1. Follow the instructions for the use of the container-toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.

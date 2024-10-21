@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   nvidia:
     image: selenium/node-chrome:3.141.59
@@ -10,4 +9,9 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
+
+      environment:
+        - NVIDIA_VISIBLE_DEVICES=all
+    restart: always
+    tty: true
     command: [ "nvidia-smi" ]
