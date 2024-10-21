@@ -9,9 +9,4 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [ gpu ]
-
-      environment:
-        - NVIDIA_VISIBLE_DEVICES=all
-    restart: always
-    tty: true
     command: [ "nvidia-smi" ]
