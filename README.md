@@ -68,7 +68,7 @@ https://github.com/HectorPulido/discord-bot-LLama/tree/6c79b3bf2d3956617f6789934
 2. It's worth to check the docker-compose.gpu.yml file and adapt it to your needs
 3. Run the docker container with the following command
 ```bash
-docker compose -f docker-compose.gpu.yml up --build
+docker compose -f docker-compose.gpu.yml up --build --remove-orphans
 ```
 4. Suffer for CUDA out of memory errors :sweat_smile:
 

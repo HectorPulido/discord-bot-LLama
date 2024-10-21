@@ -1,17 +1,3 @@
-# services:
-#   nvidia:
-#     image: selenium/node-chrome:3.141.59
-    # runtime: nvidia
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [ gpu ]
-#     command: [ "nvidia-smi" ]
-
-
 services:
   ollama:
     restart: always
@@ -51,7 +37,7 @@ services:
       dockerfile: Dockerfile.gpu.sd
     environment:
       TZ: "America/Bogota"
-      COMMANDLINE_ARGS: "--lowvram --xformers --precision full --no-half --enable-insecure-extension-access --listen  --api"
+      COMMANDLINE_ARGS: "--medvram --xformers --precision full --no-half --enable-insecure-extension-access --listen  --api"
     entrypoint: ["/bin/sh", "-c"]
     command: >
       ". /stablediff.env; echo launch.py $$COMMANDLINE_ARGS;
