@@ -51,7 +51,7 @@ services:
       dockerfile: Dockerfile.gpu.sd
     environment:
       TZ: "America/Bogota"
-      COMMANDLINE_ARGS: "--precision full --no-half --enable-insecure-extension-access --listen  --api"
+      COMMANDLINE_ARGS: "--lowvram --xformers --precision full --no-half --enable-insecure-extension-access --listen  --api"
     entrypoint: ["/bin/sh", "-c"]
     command: >
       ". /stablediff.env; echo launch.py $$COMMANDLINE_ARGS;
