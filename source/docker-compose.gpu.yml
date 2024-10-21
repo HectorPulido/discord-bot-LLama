@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  nvidia:
+    image: selenium/node-chrome:3.141.59
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    command: [ "nvidia-smi" ]
