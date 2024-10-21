@@ -11,7 +11,7 @@ RUN git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui /sdtemp
 #torch and torchvision version number refer to
 #https://github.com/AUTOMATIC1111/stable-diffusion-webui/blob/master/launch.py
 RUN python -m pip install lmdb
-RUN python -m pip --pre -U xformers
+RUN python -m pip install --pre -U xformers
 ENV TORCH_COMMAND="pip install torch torchvision torchaudio"
 RUN python -m $TORCH_COMMAND
 
