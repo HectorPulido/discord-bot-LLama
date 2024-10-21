@@ -65,6 +65,12 @@ https://github.com/HectorPulido/discord-bot-LLama/tree/6c79b3bf2d3956617f6789934
 
 ### GPU Support - Only tested on Ubuntu and Nvidia
 1. Follow the instructions for the use of the container-toolkit: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+2. It's worth to check the docker-compose.gpu.yml file and adapt it to your needs
+3. Run the docker container with the following command
+```bash
+docker compose -f docker-compose.gpu.yml up --build
+```
+4. Suffer for CUDA out of memory errors :sweat_smile:
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
