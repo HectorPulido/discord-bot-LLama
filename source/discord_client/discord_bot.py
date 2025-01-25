@@ -100,10 +100,18 @@ class DiscordLLMBot(Bot):
 
     def _edit_message_callback(self, message, max_iterations=5):
         async def message_callback(output, force=False, iteration=0):
-            if len(output) < 15:
+            if "<think>" in output and "</think>" not in output:
                 return
+            
+            output_cleared = output.split("</think>")[-1]
+
+            if len(output_cleared) < 15:
+                return
+            if len(output_cleared) > 1998:
+                return
+
             if force or iteration % max_iterations == 0:
-                await message.edit(content=output)
+                await message.edit(content=output_cleared)
 
         return message_callback
 
@@ -138,8 +146,11 @@ class DiscordLLMBot(Bot):
     async def _check_for_image(
         self, message_input: str, message_output: str, message: discord.Message
     ):
-        message_data = f"{message_input}\n{message_output}"
-        response = await self.sd_llm_model.evaluate(message_data)
+        message_data = f"{message_input}\n{message_output}".replace("<think>", "(think)").replace("</think>", "(/think)")
+
+        response = await self.sd_llm_model.evaluate_stream(
+            message_data
+        )
         logging.info("SD Response: %s", response)
         if "N/A" in response.upper() or len(response) < 5:
             return None

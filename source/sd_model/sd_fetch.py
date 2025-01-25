@@ -63,6 +63,7 @@ class SDClient:
             prompt,
             inverse_prompt,
         )
+        prompt = prompt.split('</think>')[-1]
         payload = json.dumps(
             {
                 "prompt": prompt,
