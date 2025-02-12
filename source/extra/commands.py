@@ -52,6 +52,8 @@ async def generate_image(_, command, message, ctx):
             content, inverse_prompt = content.split("|")
 
         file_name = await sd_client.txt2img(content, inverse_prompt)
+        if not file_name:
+            return
 
         await message.reply(file=discord.File(file_name), mention_author=True)
 

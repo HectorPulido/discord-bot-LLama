@@ -161,7 +161,7 @@ class DiscordLLMBot(Bot):
             logging.error("Error generating image: %s", e)
             return
 
-        if file_name is None:
+        if not file_name:
             return
 
         file = discord.File(file_name)
