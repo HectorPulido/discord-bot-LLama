@@ -11,6 +11,9 @@ The following instructions will help you install LLAMA on your machine through t
 - Docker Compose
 - Discord Token
 
+## Video; 🔥 hice EL MEJOR bot de DISCORD - CREA UNO TU TAMBIÉN
+[![Youtube video](https://img.youtube.com/vi/D8Z4XIi3H6U/0.jpg)](https://www.youtube.com/watch?v=D8Z4XIi3H6U)<br/>
+
 
 ## Create the bot account and get the token
 1. Make sure you’re logged on to the [Discord website](https://discord.com/).
