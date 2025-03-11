@@ -1,7 +1,7 @@
 # LLAMA - Discord Chatbot
 This repo is an implementartion of [LLAMA/ALPACA](https://github.com/tloen/alpaca-lora/). It's a chatbot made with Python that simulates natural conversation with users. The chatbot is designed to be used in the **Discord** platform, providing an interactive experience for the users.
 
-![image demo of the game](/img/example.png)<br/>
+<img src="/img/example.png" alt="demo image of the bot" width="512"/>
 
 # Installation
 The following instructions will help you install LLAMA on your machine through the docker
