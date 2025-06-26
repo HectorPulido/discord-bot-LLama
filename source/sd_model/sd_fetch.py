@@ -55,6 +55,17 @@ class SDClient:
         Generate an image from a text prompt.
         """
 
+        is_json = False
+        # Check if the prompt a json
+        try:
+            prompt = json.loads(prompt)
+            is_json = True
+            logging.info("prompt is json")
+        except json.JSONDecodeError:
+            is_json = False
+            logging.info("prompt is plain text")
+            pass
+
         if inverse_prompt is None:
             inverse_prompt = self.negative_prompt
 
@@ -63,16 +74,28 @@ class SDClient:
             prompt,
             inverse_prompt,
         )
-        payload = json.dumps(
-            {
-                "prompt": prompt,
-                "negative_prompt": inverse_prompt,
-                "steps": self.steps,
-                "override_settings": {
-                    "sd_model_checkpoint": self.sd_checkpoint,
-                },
+
+        if is_json:
+            prompt["override_settings"] = {
+                "sd_model_checkpoint": self.sd_checkpoint,
             }
-        )
+            prompt["steps"] = (
+                min(self.steps, prompt["steps"]) if "steps" in prompt else self.steps
+            )
+            payload = json.dumps(prompt)
+
+        else:
+            prompt = prompt.split("</think>")[-1]
+            payload = json.dumps(
+                {
+                    "prompt": prompt,
+                    "negative_prompt": inverse_prompt,
+                    "steps": self.steps,
+                    "override_settings": {
+                        "sd_model_checkpoint": self.sd_checkpoint,
+                    },
+                }
+            )
         headers = {"Content-Type": "application/json"}
 
         # 5 mins
@@ -85,13 +108,15 @@ class SDClient:
             logging.error("Error generating image: %s", response.text)
             return ""
 
-        r = response.json()
-
-        # Decode and save the image.
-        random_number = random.randint(0, 100000)
-        file_name = f"output_{random_number}.png"
-        with open(file_name, "wb") as f:
-            f.write(base64.b64decode(r["images"][0]))
+        try:
+            r = response.json()
+            random_number = random.randint(0, 100000)
+            file_name = f"output_{random_number}.png"
+            with open(file_name, "wb") as f:
+                f.write(base64.b64decode(r["images"][0]))
+        except Exception as e:
+            logging.error("Error decoding image: %s", e)
+            return ""
 
         logging.info("Image generated: %s", file_name)
         return file_name

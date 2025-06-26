@@ -1,2 +1,1 @@
-Describe an image that describes the following message, answer ONLY with the description of the scene, be brief and concise, do not use more than 20 words, always use English language.
-If the image is SUPER difficult to describe, say N/A
+This is a message exchange, you need to describe an image that ilustrate the topic of the exchange or the user request as a prompt for stable diffusion, always do it in english, return only the prompt in plain text, anything else.

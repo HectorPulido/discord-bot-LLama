@@ -58,10 +58,17 @@ class GeneralLLMModel(LLMModel):
 
         return output
 
-    async def evaluate_stream(self, initial_input_text, callback, memory=None):
+    async def evaluate_stream(self, initial_input_text, callback=None, memory=None):
         """
         Get the model's response to the input text.
         """
+
+        async def ph_callback(output, force=False, iteration=0):
+            pass
+
+        if callback is None:
+            callback = ph_callback
+
         prompt = self._get_prompt(initial_input_text, memory)
 
         stream = await self._generate_stream_output(prompt)
@@ -73,14 +80,15 @@ class GeneralLLMModel(LLMModel):
             output += (
                 chunk.choices[0].delta.content if chunk.choices[0].delta.content else ""
             )
-            if iteration % 10 == 0:  # Avoid rate limit
-                await callback(output, iteration=iteration)
+            await callback(output, iteration=iteration)
 
         await callback(output, True)
 
         output = self._post_process(output, initial_input_text, memory)
 
         await callback(output, True)
+
+        logging.debug(output)
         return output
 
     def evaluate_sync(self, initial_input_text, memory=None):
