@@ -2,8 +2,12 @@ services:
   ollama:
     restart: always
     image: ollama/ollama
+    ports:
+      - 11434:11434
     volumes:
       - ./ollama:/root/.ollama
+    networks:
+      - discord-network
 
   beat: 
     restart: always
@@ -14,6 +18,8 @@ services:
     command: python main.py
     volumes:
       - .:/code
+    networks:
+      - discord-network
 
   stablediff:
     restart: always
@@ -36,3 +42,9 @@ services:
       - ./stablediff.env:/stablediff.env
       - ./stablediff-web:/stablediff-web
       - ./stablediff-models:/stablediff-web/models/Stable-diffusion
+    networks:
+      - discord-network
+
+networks:
+  discord-network:
+    external: false

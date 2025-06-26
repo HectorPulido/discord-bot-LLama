@@ -18,10 +18,12 @@ CHAT_CHANNELS = os.getenv("CHAT_CHANNELS")
 EMOJI_ONLY_CHANNELS = os.getenv("EMOJI_ONLY_CHANNELS")
 
 OLLAMA_URL = os.getenv("OLLAMA_URL")
+API_KEY = os.getenv("API_KEY")
 
 LLM_Data = {
     "model_name": MODEL_NAME,
     "ollama_url": OLLAMA_URL,
+    "api_key": API_KEY,
 }
 
 SD_CHECKPOINT = os.getenv("SD_CHECKPOINT")

@@ -4,7 +4,6 @@ General class for LLM models.
 
 import logging
 from llms_models.llm_model import LLMModel
-from utils import to_thread
 
 
 class GeneralLLMModel(LLMModel):
@@ -71,8 +70,11 @@ class GeneralLLMModel(LLMModel):
 
         for chunk in stream:
             iteration += 1
-            output += chunk["message"]["content"]
-            await callback(output, iteration=iteration)
+            output += (
+                chunk.choices[0].delta.content if chunk.choices[0].delta.content else ""
+            )
+            if iteration % 10 == 0:  # Avoid rate limit
+                await callback(output, iteration=iteration)
 
         await callback(output, True)
 

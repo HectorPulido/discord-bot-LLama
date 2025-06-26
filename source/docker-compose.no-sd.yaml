@@ -1,0 +1,25 @@
+services:
+  ollama:
+    restart: always
+    image: ollama/ollama
+    ports:
+      - 11434:11434
+    volumes:
+      - ./ollama:/root/.ollama
+    networks:
+      - discord-network
+
+  beat: 
+    restart: always
+    build: .
+    depends_on:
+      - ollama
+    command: python main.py
+    volumes:
+      - .:/code
+    networks:
+      - discord-network
+
+networks:
+  discord-network:
+    external: false

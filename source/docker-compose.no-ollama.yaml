@@ -1,0 +1,7 @@
+services:
+  beat: 
+    restart: always
+    build: .
+    command: python main.py
+    volumes:
+      - .:/code

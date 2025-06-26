@@ -4,10 +4,8 @@ Base class for LLM models
 
 import logging
 from abc import ABC, abstractmethod
-
-from ollama import Client
-import ollama
-
+import requests
+from openai import OpenAI
 from utils import to_thread
 from memory_models import MemoryModel
 
@@ -39,13 +37,14 @@ class LLMModel(ABC):
         self.translator = self.kwargs.get("translator", None)
         self.option = self.kwargs.get("option", None)
         self.ollama_url = self.kwargs.get("ollama_url", None)
+        self.api_key = self.kwargs.get("api_key", "ollama")
 
-        if self.ollama_url is not None:
-            self.client_ollama = Client(host=self.ollama_url)
-        else:
-            self.client_ollama = ollama
+        self.client = OpenAI(
+            base_url=self.ollama_url,
+            api_key=self.api_key,
+        )
 
-        self.client_ollama.pull(self.llm_model)
+        self.pull_model(self.ollama_url, self.llm_model)
 
         if (
             "prompt" in kwargs
@@ -64,6 +63,18 @@ class LLMModel(ABC):
         if "prompt" in kwargs and kwargs["prompt"] is not None:
             prompt = kwargs.get("prompt", None)
             self.prompt = prompt
+
+    def pull_model(self, base_url, model):
+        """
+        Try to pull model from ollama
+        """
+        url = f'http://{base_url.replace("/v1", "")}/api/pull'.replace(
+            "http://http://", "http://"
+        ).replace("http://https://", "https://")
+
+        payload = f'{{"name": "{model}","stream": false}}'
+        headers = {}
+        requests.request("POST", url, headers=headers, data=payload, timeout=1000)
 
     @to_thread
     def evaluate(self, initial_input_text: str, memory: MemoryModel = None) -> str:
@@ -105,9 +116,8 @@ class LLMModel(ABC):
     @to_thread
     def _generate_stream_output(self, prompt):
         try:
-            stream = self.client_ollama.chat(
+            stream = self.client.chat.completions.create(
                 model=self.llm_model,
-                options=self.option,
                 messages=prompt,
                 stream=True,
             )
@@ -118,12 +128,10 @@ class LLMModel(ABC):
 
     def _generate_output(self, prompt):
         try:
-            response = self.client_ollama.chat(
-                model=self.llm_model,
-                options=self.option,
-                messages=prompt,
+            response = self.client.chat.completions.create(
+                model=self.llm_model, messages=prompt, stream=False
             )
-            output = response["message"]["content"]
+            output = response.choices[0].message.content
             logging.debug("Generated output: %s", output)
             return output
         except Exception as e:

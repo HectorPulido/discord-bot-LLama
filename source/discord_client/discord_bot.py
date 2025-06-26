@@ -26,8 +26,8 @@ class DiscordLLMBot(Bot):
 
     def __init__(
         self,
-        LLM_Data: dict,
-        SD_Data: dict,
+        llm_data: dict,
+        sd_data: dict,
         channel_data: str,
         memory_size: int = 5,
         use_translator: bool = False,
@@ -38,29 +38,30 @@ class DiscordLLMBot(Bot):
 
         self.translator = Translator() if use_translator else None
         self.model = GeneralLLMModel(
-            LLM_Data["model_name"],
+            llm_data["model_name"],
             self.translator,
             prompt_path=self.BASE_PROMPT_PATH,
             temp=0.9,
-            ollama_url=LLM_Data.get("ollama_url"),
+            ollama_url=llm_data.get("ollama_url"),
+            api_key=llm_data.get("api_key"),
         )
 
         # Initialize Stable Diffusion if data is provided
         self.sd_client = (
             SDClient(
-                SD_Data["url"], SD_Data["checkpoint"], 10, self.SD_INVERSE_PROMPT_PATH
+                sd_data["url"], sd_data["checkpoint"], 10, self.SD_INVERSE_PROMPT_PATH
             )
-            if SD_Data.get("url") and SD_Data.get("checkpoint")
+            if sd_data.get("url") and sd_data.get("checkpoint")
             else None
         )
 
         self.sd_llm_model = (
             GeneralLLMModel(
-                LLM_Data["model_name"],
+                llm_data["model_name"],
                 None,
                 prompt_path=self.SD_PROMPT_PATH,
                 temp=0.1,
-                ollama_url=LLM_Data.get("ollama_url"),
+                ollama_url=llm_data.get("ollama_url"),
             )
             if self.sd_client
             else None
@@ -102,8 +103,10 @@ class DiscordLLMBot(Bot):
         async def message_callback(output, force=False, iteration=0):
             if len(output) < 15:
                 return
+            if "<think>" in output and "</think>" not in output:
+                return
             if force or iteration % max_iterations == 0:
-                await message.edit(content=output)
+                await message.edit(content=output.split("</think>")[-1][:3999])
 
         return message_callback
 
