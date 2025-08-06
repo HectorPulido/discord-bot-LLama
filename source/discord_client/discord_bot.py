@@ -101,7 +101,7 @@ class DiscordLLMBot(Bot):
 
     def _edit_message_callback(self, message, max_iterations=5):
         async def message_callback(output, force=False, iteration=0):
-            output_cleared = output.split("</think>")[-1][:3999]
+            output_cleared = output.split("</think>")[-1][:1999]
             if "<think>" in output and "</think>" not in output:
                 return
             if len(output_cleared) < 15:
