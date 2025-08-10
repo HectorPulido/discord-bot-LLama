@@ -1,16 +1,14 @@
 """
 Emoji only channel manager
 """
+
 import re
-from utils import is_valid_channel
 
 
-async def manage_emojis_channel(message, channels):
+async def manage_emojis_channel(message):
     """
     Remove all discord emojis
     """
-    if not is_valid_channel(message, channels):
-        return
 
     message_content = message.content.lower()
 
