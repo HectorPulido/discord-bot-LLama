@@ -3,5 +3,3 @@ services:
     restart: always
     build: .
     command: python app.py
-    volumes:
-      - .:/code
