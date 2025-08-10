@@ -15,7 +15,7 @@ services:
     depends_on:
       - ollama
       - stablediff
-    command: python main.py
+    command: python app.py
     volumes:
       - .:/code
     networks:

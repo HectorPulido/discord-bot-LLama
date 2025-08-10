@@ -14,7 +14,7 @@ services:
     build: .
     depends_on:
       - ollama
-    command: python main.py
+    command: python app.py
     volumes:
       - .:/code
     networks:
